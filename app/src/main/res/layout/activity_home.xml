@@ -1,122 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#1C2526"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:gravity="center">
+    android:padding="24dp"
+    android:gravity="center_horizontal">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:gravity="center"
+        android:layout_marginBottom="32dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/greeting_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="Olá, Renato!"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
+            android:textColor="#E0E0E0"
+            android:textSize="24sp"
             android:textStyle="bold" />
 
         <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:src="@android:drawable/ic_dialog_info"
-            android:layout_marginStart="8dp" />
+            android:layout_marginEnd="12dp"
+            android:contentDescription="Informações"
+            app:tint="#B0B0B0" />
 
         <ImageView
             android:id="@+id/profile_image"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@android:drawable/ic_dialog_info"
-            android:layout_marginStart="8dp"
-            android:background="@android:drawable/ic_menu_gallery"
-            android:scaleType="fitCenter" />
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@android:drawable/ic_menu_gallery"
+            android:background="@drawable/circle_border_white"
+            android:scaleType="centerCrop"
+            android:contentDescription="Foto de Perfil" />
     </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Selecione uma opção"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:layout_marginBottom="32dp" />
+        android:textColor="#B0B0B0"
+        android:textSize="18sp"
+        android:layout_marginBottom="48dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="8dp">
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/training_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/border"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#2A3439"
-                android:gravity="center">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Treino"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:gravity="center" />
-            </LinearLayout>
+            android:background="@drawable/rounded_button_background"
+            android:padding="16dp"
+            android:layout_marginBottom="24dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:src="@drawable/treino_icon"
-                android:layout_marginStart="8dp" />
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Ícone de Treino"
+                app:tint="#76FF03" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Treino"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_send"
+                android:contentDescription="Avançar"
+                app:tint="#FFFFFF" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/diet_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/border"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#2A3439"
-                android:gravity="center">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Alimentação"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:gravity="center" />
-            </LinearLayout>
+            android:background="@drawable/rounded_button_background"
+            android:padding="16dp"
+            android:layout_marginBottom="24dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:src="@drawable/alimentacao_icon"
-                android:layout_marginStart="8dp" />
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Ícone de Alimentação"
+                app:tint="#FFC107" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Alimentação"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_send"
+                android:contentDescription="Avançar"
+                app:tint="#FFFFFF" />
         </LinearLayout>
     </LinearLayout>
 
@@ -125,8 +136,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Nenhum dado disponível"
-        android:textColor="#FFFFFF"
+        android:textColor="#808080"
         android:textSize="16sp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:visibility="gone" />
 </LinearLayout>
