@@ -10,12 +10,16 @@ import androidx.activity.ComponentActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.view.WindowManager
 
 class DayDetailsScreen : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_day_details)
+
+        // Impedir capturas de tela
+        window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
 
         // Recuperar o dia e o tipo de dados
         val dayOfWeek = intent.getStringExtra("DAY_OF_WEEK") ?: "Segunda-feira"
@@ -68,7 +72,15 @@ class DayDetailsScreen : ComponentActivity() {
                     val planilha = response.body()!!
                     Log.d("DayDetailsScreen", "Dados recebidos: $planilha")
                     if (planilha.error == null) {
+                        // Verificar se há PDF para o dia
                         val backendDay = mapDayToBackendFormat(dayOfWeek)
+                        val weeklyPdf = planilha.weekly_pdfs?.find { it.weekday == backendDay }
+                        if (weeklyPdf != null && weeklyPdf.pdf_url != null) {
+                            detailsText.text = "PDF disponível para $dayOfWeek.\nClique aqui para visualizar: ${weeklyPdf.pdf_url}"
+                            // Aqui você pode adicionar um clique para abrir o PDF em um visualizador
+                            return
+                        }
+
                         val details = when (dataType) {
                             "TRAINING" -> {
                                 val trainings = planilha.trainings?.filter { it.weekday == backendDay } ?: emptyList()
@@ -102,8 +114,13 @@ class DayDetailsScreen : ComponentActivity() {
                         }
                         detailsText.text = details
                     } else {
-                        Toast.makeText(this@DayDetailsScreen, planilha.error, Toast.LENGTH_SHORT).show()
-                        finish()
+                        if (planilha.error == "Conta expirada. Entre em contato com o administrador.") {
+                            Toast.makeText(this@DayDetailsScreen, planilha.error, Toast.LENGTH_LONG).show()
+                            navigateToLogin()
+                        } else {
+                            Toast.makeText(this@DayDetailsScreen, planilha.error, Toast.LENGTH_SHORT).show()
+                            finish()
+                        }
                     }
                 } else {
                     Toast.makeText(this@DayDetailsScreen, "Erro ao carregar dados: ${response.message()}", Toast.LENGTH_SHORT).show()

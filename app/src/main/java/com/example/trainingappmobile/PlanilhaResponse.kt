@@ -7,7 +7,8 @@ data class PlanilhaResponse(
     val role: String?,
     val trainings: List<Training>?,
     val meals: List<Meal>?,
-    val error: String?
+    val error: String?,
+    val weekly_pdfs: List<WeeklyPdf>?,
 )
 
 data class Training(
@@ -40,5 +41,11 @@ data class Comida(
     val name: String,
     val amount: String,
     val id: Int?,
+)
+
+data class WeeklyPdf(
+    val id: Int?,
+    val weekday: String?,
+    val pdf_url: String?
 )
 
