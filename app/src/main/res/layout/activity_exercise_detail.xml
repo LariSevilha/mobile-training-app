@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1A1A1A">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/logo_image"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logo"
+            android:contentDescription="Logo do aplicativo"
+            android:adjustViewBounds="true"
+            android:layout_gravity="center"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:id="@+id/exercise_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nome do Exercício"
+            android:textColor="#CEAC5E"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="24dp" />
+
+        <ImageView
+            android:id="@+id/exercise_image"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+        android:contentDescription="Ilustração do exercício"
+        android:scaleType="centerInside"
+        android:layout_marginBottom="24dp"
+        android:visibility="gone" />
+
+        <!-- Instruções de como fazer -->
+        <TextView
+            android:id="@+id/how_to_do_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="COMO FAZER:"
+            android:textColor="#CEAC5E"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/how_to_do_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Instruções detalhadas de como executar o exercício."
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/input_background"
+            android:padding="12dp" />
+
+        <TextView
+            android:id="@+id/tips_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="VEJA NA PRÁTICA:"
+            android:textColor="#CEAC5E"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tips_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dicas práticas para executar o exercício corretamente."
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/input_background"
+            android:padding="12dp" />
+
+        <TextView
+            android:id="@+id/video_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clique para ver o vídeo"
+            android:textColor="#CEAC5E"
+            android:textSize="14sp"
+            android:layout_marginBottom="24dp"
+            android:visibility="gone"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <LinearLayout
+            android:id="@+id/back_button_detail"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/button_background"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginBottom="24dp"
+            android:elevation="4dp"
+            android:clickable="true"
+            android:focusable="true">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="← Voltar"
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="80dp"
+            android:layout_height="1dp"
+            android:background="#CEAC5E"
+            android:alpha="0.5"
+            android:layout_gravity="center"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Renato Frutuoso\ncrf 0000"
+            android:textColor="#94A3B8"
+            android:textSize="12sp"
+            android:gravity="center" />
+
+    </LinearLayout>
+</ScrollView>

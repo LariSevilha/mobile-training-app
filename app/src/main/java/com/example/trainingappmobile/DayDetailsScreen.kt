@@ -4,8 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
-import android.widget.TableLayout
-import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -13,6 +11,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import android.view.WindowManager
+import android.view.View
 
 class DayDetailsScreen : ComponentActivity() {
 
@@ -31,8 +30,8 @@ class DayDetailsScreen : ComponentActivity() {
         val dayTitle = findViewById<TextView>(R.id.day_title)
         dayTitle.text = "Detalhes de $dayOfWeek"
 
-        // Referência à tabela de detalhes
-        val detailsTable = findViewById<TableLayout>(R.id.details_text)
+        // Referência ao container de treinos
+        val trainingsContainer = findViewById<LinearLayout>(R.id.trainings_container)
 
         // Referência ao botão de voltar
         val backButton = findViewById<LinearLayout>(R.id.back_button)
@@ -56,7 +55,7 @@ class DayDetailsScreen : ComponentActivity() {
         }
 
         // Carregar os dados do dia
-        loadDayDetails(apiKey, deviceId, dayOfWeek, dataType, detailsTable)
+        loadDayDetails(apiKey, deviceId, dayOfWeek, dataType, trainingsContainer)
     }
 
     private fun loadDayDetails(
@@ -64,7 +63,7 @@ class DayDetailsScreen : ComponentActivity() {
         deviceId: String,
         dayOfWeek: String,
         dataType: String,
-        detailsTable: TableLayout
+        trainingsContainer: LinearLayout
     ) {
         val authHeader = "Bearer $apiKey"
         Log.d("DayDetailsScreen", "Carregando dados para $dayOfWeek com tipo $dataType")
@@ -74,167 +73,106 @@ class DayDetailsScreen : ComponentActivity() {
                     val planilha = response.body()!!
                     Log.d("DayDetailsScreen", "Dados recebidos: $planilha")
                     if (planilha.error == null) {
-                        // Limpar tabela existente
-                        detailsTable.removeAllViews()
+                        // Limpar container
+                        trainingsContainer.removeAllViews()
 
                         // Verificar se há PDF para o dia
                         val backendDay = mapDayToBackendFormat(dayOfWeek)
                         val weeklyPdf = planilha.weekly_pdfs?.find { it.weekday == backendDay }
                         if (weeklyPdf != null && weeklyPdf.pdf_url != null) {
-                            val row = TableRow(this@DayDetailsScreen)
-                            val textView = TextView(this@DayDetailsScreen).apply {
-                                layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
-                                text = "PDF disponível para $dayOfWeek.\nClique aqui para visualizar: ${weeklyPdf.pdf_url}"
-                                textSize = 14f
-                                setTextColor(0xFFFFFFFF.toInt())
-                                gravity = android.view.Gravity.CENTER
-                                setPadding(8, 8, 8, 8)
+                            val pdfView = layoutInflater.inflate(R.layout.item_training, trainingsContainer, false)
+                            pdfView.findViewById<TextView>(R.id.exercise_name).text = "PDF disponível para $dayOfWeek"
+                            pdfView.findViewById<TextView>(R.id.series_text).visibility = View.GONE
+                            pdfView.findViewById<TextView>(R.id.reps_text).apply {
+                                text = "Clique para visualizar"
+                                setTextColor(0xFFCEAC5E.toInt())
                                 setOnClickListener {
                                     val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(weeklyPdf.pdf_url))
                                     startActivity(intent)
                                 }
                             }
-                            row.addView(textView)
-                            detailsTable.addView(row)
+                            trainingsContainer.addView(pdfView)
                             return
                         }
 
                         when (dataType) {
                             "TRAINING" -> {
-                                // Cabeçalho da tabela
-                                val headerRow = TableRow(this@DayDetailsScreen).apply {
-                                    setBackgroundColor(0xFF2D2D2D.toInt())
-                                    setPadding(8, 8, 8, 8)
-                                }
-                                listOf("Exercício", "Séries", "Repetições", "Vídeo").forEach { header ->
-                                    val textView = TextView(this@DayDetailsScreen).apply {
-                                        layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
-                                        text = header
-                                        textSize = 14f
-                                        setTextColor(0xFFCEAC5E.toInt())
-                                        gravity = android.view.Gravity.CENTER
-                                        setPadding(8, 8, 8, 8)
-                                    }
-                                    headerRow.addView(textView)
-                                }
-                                detailsTable.addView(headerRow)
-
-                                // Dados de treinos
                                 val trainings = planilha.trainings?.filter { it.weekday == backendDay } ?: emptyList()
                                 if (trainings.isEmpty()) {
-                                    val row = TableRow(this@DayDetailsScreen)
                                     val textView = TextView(this@DayDetailsScreen).apply {
-                                        layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+                                        layoutParams = LinearLayout.LayoutParams(
+                                            LinearLayout.LayoutParams.MATCH_PARENT,
+                                            LinearLayout.LayoutParams.WRAP_CONTENT
+                                        )
                                         text = "Nenhum treino disponível para $dayOfWeek."
                                         textSize = 14f
                                         setTextColor(0xFFFFFFFF.toInt())
                                         gravity = android.view.Gravity.CENTER
                                         setPadding(8, 8, 8, 8)
                                     }
-                                    row.addView(textView)
-                                    detailsTable.addView(row)
+                                    trainingsContainer.addView(textView)
                                 } else {
                                     trainings.forEach { training ->
-                                        val row = TableRow(this@DayDetailsScreen).apply {
-                                            setPadding(8, 8, 8, 8)
-                                        }
-                                        listOf(
-                                            training.exercise_name ?: "Não especificado",
-                                            training.serie_amount ?: "N/A",
-                                            training.repeat_amount ?: "N/A",
-                                            if (training.video.isNullOrEmpty()) "N/A" else "Ver vídeo"
-                                        ).forEachIndexed { index, value ->
-                                            val textView = TextView(this@DayDetailsScreen).apply {
-                                                layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
-                                                text = value
-                                                textSize = 14f
-                                                setTextColor(0xFFFFFFFF.toInt())
-                                                gravity = android.view.Gravity.CENTER
-                                                setPadding(8, 8, 8, 8)
-                                                if (index == 3 && !training.video.isNullOrEmpty()) {
-                                                    setOnClickListener {
-                                                        val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(training.video))
-                                                        startActivity(intent)
-                                                    }
-                                                }
+                                        val trainingView = layoutInflater.inflate(R.layout.item_training, trainingsContainer, false)
+                                        trainingView.findViewById<TextView>(R.id.exercise_name).text = training.exercise_name ?: "Não especificado"
+                                        trainingView.findViewById<TextView>(R.id.series_text).text = "Séries: ${training.serie_amount ?: "N/A"}"
+                                        trainingView.findViewById<TextView>(R.id.reps_text).text = "Repetições: ${training.repeat_amount ?: "N/A"}"
+                                        trainingView.setOnClickListener {
+                                            val intent = Intent(this@DayDetailsScreen, ExerciseDetailActivity::class.java).apply {
+                                                putExtra("EXERCISE_NAME", training.exercise_name)
+                                                putExtra("EXERCISE_DESCRIPTION", training.description)
+                                                putExtra("EXERCISE_VIDEO", training.video)
+                                                putExtra("EXERCISE_PHOTOS", training.photo_urls?.toTypedArray())
                                             }
-                                            row.addView(textView)
+                                            startActivity(intent)
                                         }
-                                        detailsTable.addView(row)
+                                        trainingsContainer.addView(trainingView)
                                     }
                                 }
                             }
                             "DIET" -> {
-                                // Cabeçalho da tabela
-                                val headerRow = TableRow(this@DayDetailsScreen).apply {
-                                    setBackgroundColor(0xFF2D2D2D.toInt())
-                                    setPadding(8, 8, 8, 8)
-                                }
-                                listOf("Refeição", "Itens").forEach { header ->
-                                    val textView = TextView(this@DayDetailsScreen).apply {
-                                        layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
-                                        text = header
-                                        textSize = 14f
-                                        setTextColor(0xFFCEAC5E.toInt())
-                                        gravity = android.view.Gravity.CENTER
-                                        setPadding(8, 8, 8, 8)
-                                    }
-                                    headerRow.addView(textView)
-                                }
-                                detailsTable.addView(headerRow)
-
-                                // Dados de refeições
                                 val meals = planilha.meals?.filter { it.weekday == backendDay } ?: emptyList()
                                 if (meals.isEmpty()) {
-                                    val row = TableRow(this@DayDetailsScreen)
                                     val textView = TextView(this@DayDetailsScreen).apply {
-                                        layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+                                        layoutParams = LinearLayout.LayoutParams(
+                                            LinearLayout.LayoutParams.MATCH_PARENT,
+                                            LinearLayout.LayoutParams.WRAP_CONTENT
+                                        )
                                         text = "Nenhuma refeição disponível para $dayOfWeek."
                                         textSize = 14f
                                         setTextColor(0xFFFFFFFF.toInt())
                                         gravity = android.view.Gravity.CENTER
                                         setPadding(8, 8, 8, 8)
                                     }
-                                    row.addView(textView)
-                                    detailsTable.addView(row)
+                                    trainingsContainer.addView(textView)
                                 } else {
                                     meals.forEach { meal ->
-                                        val row = TableRow(this@DayDetailsScreen).apply {
-                                            setPadding(8, 8, 8, 8)
-                                        }
-                                        listOf(
-                                            meal.meal_type ?: "Não especificada",
+                                        val mealView = layoutInflater.inflate(R.layout.item_training, trainingsContainer, false)
+                                        mealView.findViewById<TextView>(R.id.exercise_name).text = meal.meal_type ?: "Não especificada"
+                                        mealView.findViewById<TextView>(R.id.series_text).text = "Itens: ${
                                             if (meal.comidas.isNullOrEmpty()) "Nenhum item disponível"
                                             else meal.comidas.joinToString(", ") { comida ->
                                                 "${comida.name ?: "Item desconhecido"} (${comida.amount ?: "N/A"})"
                                             }
-                                        ).forEach { value ->
-                                            val textView = TextView(this@DayDetailsScreen).apply {
-                                                layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
-                                                text = value
-                                                textSize = 14f
-                                                setTextColor(0xFFFFFFFF.toInt())
-                                                gravity = android.view.Gravity.CENTER
-                                                setPadding(8, 8, 8, 8)
-                                            }
-                                            row.addView(textView)
-                                        }
-                                        detailsTable.addView(row)
+                                        }"
+                                        mealView.findViewById<TextView>(R.id.reps_text).visibility = View.GONE
+                                        trainingsContainer.addView(mealView)
                                     }
                                 }
                             }
                             else -> {
-                                val row = TableRow(this@DayDetailsScreen)
                                 val textView = TextView(this@DayDetailsScreen).apply {
-                                    layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+                                    layoutParams = LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT
+                                    )
                                     text = "Tipo de dados inválido."
                                     textSize = 14f
                                     setTextColor(0xFFFFFFFF.toInt())
                                     gravity = android.view.Gravity.CENTER
                                     setPadding(8, 8, 8, 8)
                                 }
-                                row.addView(textView)
-                                detailsTable.addView(row)
+                                trainingsContainer.addView(textView)
                             }
                         }
                     } else {

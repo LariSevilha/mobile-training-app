@@ -8,39 +8,38 @@ data class PlanilhaResponse(
     val trainings: List<Training>?,
     val meals: List<Meal>?,
     val error: String?,
-    val weekly_pdfs: List<WeeklyPdf>?,
+    val weekly_pdfs: List<WeeklyPdf>?
 )
 
 data class Training(
     val id: Int?,
-    val exercise_name: String,
-    val serie_amount: String,
-    val repeat_amount: String,
+    val exercise_name: String, // Made nullable to match backend JSON
+    val serie_amount: String?, // Made nullable to handle null from backend
+    val repeat_amount: String?, // Made nullable to handle null from backend
     val video: String?,
-    val dayOfWeek: String,
-    val weekday: String?,
-    val exercise: String,
-    val sets: Int,
-    val reps: Int
+    val weekday: String?, // Using 'weekday' to match backend, removed 'dayOfWeek' and 'exercise'
+    val description: String?, // Added from backend
+    val photo_urls: List<String>?, // Added from backend to handle photos
+    val sets: Int? = null, // Added as optional, but may conflict with serie_amount
+    val reps: Int? = null // Added as optional, but may conflict with repeat_amount
 ) {
-    fun getSerieAmountInt(): Int = serie_amount.toIntOrNull() ?: 0
-    fun getRepeatAmountInt(): Int = repeat_amount.toIntOrNull() ?: 0
+    fun getSerieAmountInt(): Int = serie_amount?.toIntOrNull() ?: 0
+    fun getRepeatAmountInt(): Int = repeat_amount?.toIntOrNull() ?: 0
 }
 
 data class Meal(
     val id: Int?,
     val meal_type: String,
     val comidas: List<Comida>?,
-    val dayOfWeek: String,
-    val description: String,
-    val time: String,
-    val weekday: String?,
+    val weekday: String?, // Using 'weekday' to match backend, removed 'dayOfWeek'
+    val description: String?, // Added to match potential backend expansion
+    val time: String?
 )
 
 data class Comida(
-    val name: String,
-    val amount: String,
-    val id: Int?,
+    val name: String?,
+    val amount: String?,
+    val id: Int?
 )
 
 data class WeeklyPdf(
@@ -48,4 +47,3 @@ data class WeeklyPdf(
     val weekday: String?,
     val pdf_url: String?
 )
-

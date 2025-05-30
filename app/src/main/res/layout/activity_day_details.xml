@@ -34,29 +34,14 @@ android:layout_width="match_parent"
 android:layout_height="0dp"
 android:layout_weight="1"
 android:layout_marginBottom="24dp">
-<TableLayout
-    android:id="@+id/details_text"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:stretchColumns="*"
-    android:background="@drawable/input_background"
-android:padding="12dp">
-<TableRow
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#2D2D2D"
-    android:padding="8dp">
-    <TextView
-        android:layout_width="0dp"
+    <LinearLayout
+        android:id="@+id/trainings_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Carregando..."
-        android:textColor="#CEAC5E"
-        android:textSize="14sp"
-        android:fontFamily="sans-serif-medium"
-        android:gravity="center" />
-</TableRow>
-</TableLayout>
+        android:orientation="vertical"
+        android:background="@drawable/input_background"
+        android:padding="12dp">
+    </LinearLayout>
     </ScrollView>
 
 <LinearLayout
@@ -70,30 +55,31 @@ android:background="@drawable/button_background"
     android:elevation="4dp"
     android:clickable="true"
     android:focusable="true">
-<TextView
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="← Voltar"
-android:textColor="#000000"
-android:textSize="16sp"
-android:fontFamily="sans-serif-medium"
-android:textStyle="bold" />
+
+    <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="← Voltar"
+    android:textColor="#000000"
+    android:textSize="16sp"
+    android:fontFamily="sans-serif-medium"
+    android:textStyle="bold" />
     </LinearLayout>
 
 <View
 android:layout_width="80dp"
 android:layout_height="1dp"
 android:background="#CEAC5E"
-    android:alpha="0.5"
-    android:layout_gravity="center"
-    android:layout_marginBottom="24dp" />
+android:alpha="0.5"
+android:layout_gravity="center"
+android:layout_marginBottom="24dp" />
 
 <TextView
 android:layout_width="wrap_content"
 android:layout_height="wrap_content"
 android:text="Renato Frutuoso\ncrf 0000"
 android:textColor="#94A3B8"
-    android:textSize="12sp"
-    android:gravity="center" />
+android:textSize="12sp"
+android:gravity="center" />
 
     </LinearLayout>

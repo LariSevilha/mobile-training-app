@@ -18,6 +18,7 @@
             android:exported="false" />
             <activity android:name=".DaysOfWeekScreen" />
             <activity android:name=".DayDetailsScreen" />
+            <activity android:name=".ExerciseDetailActivity" />
         <activity
             android:name=".PlanilhaScreen"
             android:exported="false" />
