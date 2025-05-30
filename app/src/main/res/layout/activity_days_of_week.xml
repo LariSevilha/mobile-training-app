@@ -2,246 +2,233 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1C2526"
+    android:background="@color/background_black"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:gravity="center">
+    android:padding="24dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:gravity="center_vertical"
+        android:layout_marginBottom="32dp">
 
-        <LinearLayout
-            android:id="@+id/back_button"
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/border"
-            android:padding="8dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:background="#2A3439"
-                android:gravity="center">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Voltar"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:gravity="center" />
-            </LinearLayout>
-        </LinearLayout>
+            android:text="Selecione um dia"
+            android:textColor="@color/gold_primary"
+            android:textSize="22sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Selecione um dia"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="32dp" />
-
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="8dp">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
 
         <LinearLayout
-            android:id="@+id/monday_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/border"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:paddingHorizontal="8dp">
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#2A3439"
-                android:gravity="center">
+                android:id="@+id/monday_button"
+                style="@style/DayButtonStyle"
+                android:layout_marginBottom="16dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Segunda-feira"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:gravity="center" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/tuesday_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#2A3439"
-                android:gravity="center">
+                    style="@style/DayButtonText" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="SEG"
+                    android:textColor="@color/gold_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/day_tag_background"
+                    android:padding="6dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tuesday_button"
+                style="@style/DayButtonStyle"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Terça-feira"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:gravity="center" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/wednesday_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#2A3439"
-                android:gravity="center">
+                    style="@style/DayButtonText" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="TER"
+                    android:textColor="@color/gold_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/day_tag_background"
+                    android:padding="6dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/wednesday_button"
+                style="@style/DayButtonStyle"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Quarta-feira"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:gravity="center" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/thursday_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#2A3439"
-                android:gravity="center">
+                    style="@style/DayButtonText" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="QUA"
+                    android:textColor="@color/gold_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/day_tag_background"
+                    android:padding="6dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/thursday_button"
+                style="@style/DayButtonStyle"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Quinta-feira"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:gravity="center" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/friday_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#2A3439"
-                android:gravity="center">
+                    style="@style/DayButtonText" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="QUI"
+                    android:textColor="@color/gold_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/day_tag_background"
+                    android:padding="6dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/friday_button"
+                style="@style/DayButtonStyle"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Sexta-feira"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:gravity="center" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/saturday_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#2A3439"
-                android:gravity="center">
+                    style="@style/DayButtonText" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="SEX"
+                    android:textColor="@color/gold_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/day_tag_background"
+                    android:padding="6dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/saturday_button"
+                style="@style/DayButtonStyle"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Sábado"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:gravity="center" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/sunday_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#2A3439"
-                android:gravity="center">
+                    style="@style/DayButtonText" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="SÁB"
+                    android:textColor="@color/gold_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/day_tag_background"
+                    android:padding="6dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/sunday_button"
+                style="@style/DayButtonStyle"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Domingo"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:gravity="center" />
+                    style="@style/DayButtonText" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DOM"
+                    android:textColor="@color/gold_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/day_tag_background"
+                    android:padding="6dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/back_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/back_button_style"
+                android:padding="12dp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="← Voltar"
+                    android:textColor="@color/gold_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
             </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+    </ScrollView>
+
+    <View
+        android:layout_width="160dp"
+        android:layout_height="3dp"
+        android:background="@drawable/bottom_decoration"
+        android:layout_gravity="center"
+        android:alpha="0.6" />
+
 </LinearLayout>

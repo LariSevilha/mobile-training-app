@@ -4,4 +4,6 @@
     <color name="button_gray">#575656</color>
     <color name="text_white">#FFFFFF</color>
     <color name="gold_transparent">#33ceac5e</color>
+    <color name="day_tag_background">#1A1A1A</color>
+    <color name="button_pressed">#1A1A1A</color>
 </resources>
