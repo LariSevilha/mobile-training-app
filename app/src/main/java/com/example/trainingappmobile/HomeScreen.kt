@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -23,13 +22,12 @@ class HomeScreen : ComponentActivity() {
         val sharedPrefs = getSharedPreferences("auth", MODE_PRIVATE)
         val userName = sharedPrefs.getString("name", "Usuário")
         val greetingText = findViewById<TextView>(R.id.greeting_text)
-        greetingText.text = "Olá, $userName!"
+        greetingText.text = "Bem-vindo(a), $userName!"
 
-        // Referências aos elementos
+        // Referências aos elementos do novo layout
         val trainingButton = findViewById<LinearLayout>(R.id.training_button)
         val dietButton = findViewById<LinearLayout>(R.id.diet_button)
         val noDataText = findViewById<TextView>(R.id.no_data_text)
-        val profileImage = findViewById<ImageView>(R.id.profile_image)
 
         // Configurar cliques dos botões
         trainingButton.setOnClickListener {
