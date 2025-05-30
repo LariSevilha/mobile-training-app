@@ -2,60 +2,98 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1C2526"
+    android:background="#1A1A1A"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="24dp"
     android:gravity="center">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+<ImageView
+android:id="@+id/logo_image"
+android:layout_width="200dp"
+android:layout_height="wrap_content"
+android:src="@drawable/logo"
+    android:contentDescription="Logo do aplicativo"
+    android:adjustViewBounds="true"
+    android:layout_gravity="center"
+    android:layout_marginBottom="24dp" />
+
+<TextView
+android:id="@+id/day_title"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:text="Detalhes do Dia"
+android:textColor="#CEAC5E"
+    android:textSize="20sp"
+    android:fontFamily="sans-serif-medium"
+    android:textStyle="bold"
+    android:gravity="center"
+    android:layout_marginBottom="24dp" />
+
+<ScrollView
+android:layout_width="match_parent"
+android:layout_height="0dp"
+android:layout_weight="1"
+android:layout_marginBottom="24dp">
+<TableLayout
+    android:id="@+id/details_text"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:stretchColumns="*"
+    android:background="@drawable/input_background"
+android:padding="12dp">
+<TableRow
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#2D2D2D"
+    android:padding="8dp">
+    <TextView
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:layout_weight="1"
+        android:text="Carregando..."
+        android:textColor="#CEAC5E"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center" />
+</TableRow>
+</TableLayout>
+    </ScrollView>
 
-        <LinearLayout
-            android:id="@+id/back_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border"
-            android:padding="8dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:background="#2A3439"
-                android:gravity="center">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Voltar"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:gravity="center" />
-            </LinearLayout>
-        </LinearLayout>
+<LinearLayout
+android:id="@+id/back_button"
+android:layout_width="match_parent"
+android:layout_height="48dp"
+android:background="@drawable/button_background"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:layout_marginBottom="24dp"
+    android:elevation="4dp"
+    android:clickable="true"
+    android:focusable="true">
+<TextView
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="← Voltar"
+android:textColor="#000000"
+android:textSize="16sp"
+android:fontFamily="sans-serif-medium"
+android:textStyle="bold" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/day_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Detalhes do Dia"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="32dp" />
+<View
+android:layout_width="80dp"
+android:layout_height="1dp"
+android:background="#CEAC5E"
+    android:alpha="0.5"
+    android:layout_gravity="center"
+    android:layout_marginBottom="24dp" />
 
-    <TextView
-        android:id="@+id/details_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Carregando..."
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:layout_marginTop="16dp" />
-</LinearLayout>
+<TextView
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Renato Frutuoso\ncrf 0000"
+android:textColor="#94A3B8"
+    android:textSize="12sp"
+    android:gravity="center" />
+
+    </LinearLayout>
