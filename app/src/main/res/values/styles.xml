@@ -1,38 +1,10 @@
-<resources>
-    <style name="GoldButtonStyle">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@drawable/button_ripple_effect</item>
-        <item name="android:padding">16dp</item>
-        <item name="android:gravity">center</item>
-        <item name="android:clickable">true</item>
-        <item name="android:focusable">true</item>
-        <item name="android:elevation">2dp</item>
-        <item name="android:layout_marginBottom">24dp</item>
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Custom component styles -->
+    <style name="CustomButton" parent="Widget.AppCompat.Button">
+        <item name="android:background">@color/gold_primary</item>
+        <item name="android:textColor">@color/button_black</item>
     </style>
 
-    <style name="GoldButtonText">
-        <item name="android:textColor">@color/gold_primary</item>
-        <item name="android:textSize">20sp</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="DayButtonStyle">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@drawable/day_button_ripple</item>
-        <item name="android:padding">18dp</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:clickable">true</item>
-        <item name="android:focusable">true</item>
-        <item name="android:elevation">3dp</item>
-        <item name="android:orientation">horizontal</item>
-    </style>
-
-    <style name="DayButtonText">
-        <item name="android:textColor">@color/gold_primary</item>
-        <item name="android:textSize">18sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:gravity">center_vertical</item>
-    </style>
 </resources>

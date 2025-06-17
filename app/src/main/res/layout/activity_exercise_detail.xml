@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1A1A1A">
+    android:background="@color/background_black">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Nome do Exercício"
-            android:textColor="#CEAC5E"
+            android:textColor="@color/gold_primary"
             android:textSize="20sp"
             android:fontFamily="sans-serif-medium"
             android:textStyle="bold"
@@ -37,18 +37,17 @@
             android:id="@+id/exercise_image"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-        android:contentDescription="Ilustração do exercício"
-        android:scaleType="centerInside"
-        android:layout_marginBottom="24dp"
-        android:visibility="gone" />
+            android:contentDescription="Ilustração do exercício"
+            android:scaleType="centerInside"
+            android:layout_marginBottom="24dp"
+            android:visibility="gone" />
 
-        <!-- Instruções de como fazer -->
         <TextView
             android:id="@+id/how_to_do_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="COMO FAZER:"
-            android:textColor="#CEAC5E"
+            android:textColor="@color/gold_primary"
             android:textSize="16sp"
             android:fontFamily="sans-serif-medium"
             android:textStyle="bold"
@@ -59,7 +58,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Instruções detalhadas de como executar o exercício."
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_primary"
             android:textSize="14sp"
             android:layout_marginBottom="24dp"
             android:background="@drawable/input_background"
@@ -69,8 +68,8 @@
             android:id="@+id/tips_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="VEJA NA PRÁTICA:"
-            android:textColor="#CEAC5E"
+            android:text="DICAS:"
+            android:textColor="@color/gold_primary"
             android:textSize="16sp"
             android:fontFamily="sans-serif-medium"
             android:textStyle="bold"
@@ -80,8 +79,8 @@
             android:id="@+id/tips_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dicas práticas para executar o exercício corretamente."
-            android:textColor="#FFFFFF"
+            android:text="Mantenha a postura correta e respire fundo."
+            android:textColor="@color/text_primary"
             android:textSize="14sp"
             android:layout_marginBottom="24dp"
             android:background="@drawable/input_background"
@@ -91,8 +90,8 @@
             android:id="@+id/video_link"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Clique para ver o vídeo"
-            android:textColor="#CEAC5E"
+            android:text="VEJA NA PRÁTICA: Clique para ver o vídeo"
+            android:textColor="@color/gold_primary"
             android:textSize="14sp"
             android:layout_marginBottom="24dp"
             android:visibility="gone"
@@ -101,20 +100,12 @@
 
         <LinearLayout
             android:id="@+id/back_button_detail"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/button_background"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:layout_marginBottom="24dp"
-            android:elevation="4dp"
-            android:clickable="true"
-            android:focusable="true">
+            style="@style/GoldButtonStyle">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="← Voltar"
-                android:textColor="#000000"
+                android:textColor="@color/button_black"
                 android:textSize="16sp"
                 android:fontFamily="sans-serif-medium"
                 android:textStyle="bold" />
@@ -123,7 +114,7 @@
         <View
             android:layout_width="80dp"
             android:layout_height="1dp"
-            android:background="#CEAC5E"
+            android:background="@color/gold_primary"
             android:alpha="0.5"
             android:layout_gravity="center"
             android:layout_marginBottom="24dp" />
@@ -132,9 +123,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Renato Frutuoso\ncrf 0000"
-            android:textColor="#94A3B8"
+            android:textColor="@color/text_secondary"
             android:textSize="12sp"
             android:gravity="center" />
-
     </LinearLayout>
 </ScrollView>

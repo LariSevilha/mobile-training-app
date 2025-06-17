@@ -1,25 +1,28 @@
 package com.example.trainingappmobile
 
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.POST
+import retrofit2.http.*
+import okhttp3.ResponseBody
 
 interface ApiService {
-    @POST("api/v1/sessions")
-    fun login(@Body request: LoginRequest): Call<LoginResponse>
 
-    @GET("api/v1/planilha")
-    fun getPlanilha(
-        @Header("Authorization") authHeader: String,
-        @Header("Device-ID") deviceId: String
-    ): Call<PlanilhaResponse>
+    @FormUrlEncoded
+    @POST("auth/login")
+    fun login(
+        @Field("email") email: String,
+        @Field("password") password: String,
+        @Field("device_id") deviceId: String
+    ): Call<LoginResponse>
 
-    @DELETE("api/v1/sessions")
+    @DELETE("auth/logout")
     fun logout(
-        @Header("Authorization") authHeader: String,
-        @Header("Device-ID") deviceId: String
-    ): Call<Void>
+        @Header("Authorization") authorization: String,
+        @Query("device_id") deviceId: String
+    ): Call<ResponseBody>
+
+    @GET("planilhas")
+    fun getPlanilha(
+        @Header("Authorization") authorization: String,
+        @Query("device_id") deviceId: String
+    ): Call<PlanilhaResponse>
 }

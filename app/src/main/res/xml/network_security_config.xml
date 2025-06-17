@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">10.0.2.2</domain>
-        <!-- ou use o IP do seu servidor se estiver em rede local -->
+        <domain includeSubdomains="true">192.168.0.111</domain>
     </domain-config>
     <!-- Permite HTTP claro para qualquer domínio (apenas em debug) -->
     <base-config cleartextTrafficPermitted="true" />

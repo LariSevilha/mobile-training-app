@@ -11,10 +11,8 @@ class DaysOfWeekScreen : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_days_of_week)
 
-        // Recuperar o tipo de dados (TRAINING ou DIET)
         val dataType = intent.getStringExtra("DATA_TYPE") ?: "TRAINING"
 
-        // Referências aos botões dos dias
         val mondayButton = findViewById<LinearLayout>(R.id.monday_button)
         val tuesdayButton = findViewById<LinearLayout>(R.id.tuesday_button)
         val wednesdayButton = findViewById<LinearLayout>(R.id.wednesday_button)
@@ -24,39 +22,14 @@ class DaysOfWeekScreen : ComponentActivity() {
         val sundayButton = findViewById<LinearLayout>(R.id.sunday_button)
         val backButton = findViewById<LinearLayout>(R.id.back_button)
 
-        // Configurar cliques para cada dia
-        mondayButton.setOnClickListener {
-            navigateToDayDetails("Segunda-feira", dataType)
-        }
-
-        tuesdayButton.setOnClickListener {
-            navigateToDayDetails("Terça-feira", dataType)
-        }
-
-        wednesdayButton.setOnClickListener {
-            navigateToDayDetails("Quarta-feira", dataType)
-        }
-
-        thursdayButton.setOnClickListener {
-            navigateToDayDetails("Quinta-feira", dataType)
-        }
-
-        fridayButton.setOnClickListener {
-            navigateToDayDetails("Sexta-feira", dataType)
-        }
-
-        saturdayButton.setOnClickListener {
-            navigateToDayDetails("Sábado", dataType)
-        }
-
-        sundayButton.setOnClickListener {
-            navigateToDayDetails("Domingo", dataType)
-        }
-
-        // Configurar clique no botão de voltar
-        backButton.setOnClickListener {
-            finish()
-        }
+        mondayButton.setOnClickListener { navigateToDayDetails("Segunda-feira", dataType) }
+        tuesdayButton.setOnClickListener { navigateToDayDetails("Terça-feira", dataType) }
+        wednesdayButton.setOnClickListener { navigateToDayDetails("Quarta-feira", dataType) }
+        thursdayButton.setOnClickListener { navigateToDayDetails("Quinta-feira", dataType) }
+        fridayButton.setOnClickListener { navigateToDayDetails("Sexta-feira", dataType) }
+        saturdayButton.setOnClickListener { navigateToDayDetails("Sábado", dataType) }
+        sundayButton.setOnClickListener { navigateToDayDetails("Domingo", dataType) }
+        backButton.setOnClickListener { finish() }
     }
 
     private fun navigateToDayDetails(dayOfWeek: String, dataType: String) {
@@ -64,10 +37,5 @@ class DaysOfWeekScreen : ComponentActivity() {
         intent.putExtra("DAY_OF_WEEK", dayOfWeek)
         intent.putExtra("DATA_TYPE", dataType)
         startActivity(intent)
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finish()
     }
 }

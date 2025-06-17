@@ -4,82 +4,97 @@
     android:layout_height="match_parent"
     android:background="@color/background_black"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:gravity="center_horizontal">
+    android:padding="16dp">
 
-    <!-- Logo Section -->
-    <ImageView
-        android:id="@+id/logo_image"
-        android:layout_width="224dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="48dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/logo"
-        android:contentDescription="Logo da marca" />
-
+    <!-- Saudação -->
     <TextView
         android:id="@+id/greeting_text"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Bem-vindo(a), Renato!"
+        android:text="Bem-vindo(a), Usuário!"
         android:textColor="@color/gold_primary"
         android:textSize="20sp"
-        android:textStyle="normal"
-        android:layout_marginBottom="40dp" />
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
 
+    <!-- Botão de Treino -->
     <LinearLayout
+        android:id="@+id/training_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginHorizontal="32dp"
-        android:gravity="center">
+        android:background="@drawable/button_background"
+        android:gravity="center"
+        android:padding="12dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginBottom="8dp">
 
-        <LinearLayout
-            android:id="@+id/training_button"
-            style="@style/GoldButtonStyle"
-            android:background="@drawable/button_ripple_effect">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Treino"
-                style="@style/GoldButtonText" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/diet_button"
-            style="@style/GoldButtonStyle"
-            android:background="@drawable/button_ripple_effect">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Alimentação"
-                style="@style/GoldButtonText" />
-        </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Treinos"
+            android:textColor="@color/button_black"
+            android:textSize="16sp" />
     </LinearLayout>
 
-    <Space
+    <!-- Botão de Dieta -->
+    <LinearLayout
+        android:id="@+id/diet_button"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_background"
+        android:gravity="center"
+        android:padding="12dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginBottom="8dp">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dietas"
+            android:textColor="@color/button_black"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <!-- Card de PDF -->
+    <LinearLayout
+        android:id="@+id/pdf_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_background"
+        android:gravity="center"
+        android:padding="12dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ver PDF"
+            android:textColor="@color/button_black"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <!-- Texto de Sem Dados -->
     <TextView
         android:id="@+id/no_data_text"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Nenhum dado disponível"
-        android:textColor="#808080"
-        android:textSize="16sp"
-        android:layout_marginBottom="32dp"
+        android:textColor="@color/error_red"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="16dp" />
+
+    <!-- Texto de Expiração do Plano -->
+    <TextView
+        android:id="@+id/plan_expiry_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Data de expiração: N/A"
+        android:textColor="@color/text_secondary"
+        android:gravity="center"
         android:visibility="gone" />
-
-    <View
-        android:layout_width="128dp"
-        android:layout_height="4dp"
-        android:background="@drawable/bottom_decoration"
-        android:layout_marginBottom="40dp"
-        android:alpha="0.5" />
-
 </LinearLayout>

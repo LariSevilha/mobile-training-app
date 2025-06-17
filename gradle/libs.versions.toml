@@ -1,8 +1,10 @@
 [versions]
+agp = "8.5.2"
 androidx-core-ktx = "1.13.1"
 androidx-lifecycle-runtime-ktx = "2.8.6"
 androidx-activity-compose = "1.9.2"
 androidx-compose-bom = "2024.09.03"
+androidx-compose-compiler = "1.5.11"
 androidx-ui = "1.7.0"
 androidx-ui-graphics = "1.7.0"
 androidx-ui-tooling-preview = "1.7.0"
@@ -17,7 +19,8 @@ volley = "1.2.1"
 firebase-bom = "32.7.0"
 navigation-compose = "2.8.9"
 appcompat = "1.7.0"
-kotlin = "1.9.0"
+kotlin = "2.1.0"
+
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
@@ -41,7 +44,6 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 [plugins]
-android-application = { id = "com.android.application", version = "8.2.0" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version = "2.0.20" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version = "2.0.20" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version = "2.0.20" }
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

@@ -13,7 +13,6 @@
         android:gravity="center_vertical"
         android:layout_marginBottom="32dp">
 
-
         <View
             android:layout_width="0dp"
             android:layout_height="1dp"
@@ -25,6 +24,7 @@
             android:text="Selecione um dia"
             android:textColor="@color/gold_primary"
             android:textSize="22sp"
+            android:fontFamily="sans-serif-medium"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -44,14 +44,9 @@
                 android:id="@+id/monday_button"
                 style="@style/DayButtonStyle"
                 android:layout_marginBottom="16dp">
-
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Segunda-feira"
-                    style="@style/DayButtonText" />
-
+                    style="@style/DayButtonText"
+                    android:text="Segunda-feira" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -67,14 +62,9 @@
                 android:id="@+id/tuesday_button"
                 style="@style/DayButtonStyle"
                 android:layout_marginBottom="16dp">
-
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Terça-feira"
-                    style="@style/DayButtonText" />
-
+                    style="@style/DayButtonText"
+                    android:text="Terça-feira" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -90,14 +80,9 @@
                 android:id="@+id/wednesday_button"
                 style="@style/DayButtonStyle"
                 android:layout_marginBottom="16dp">
-
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Quarta-feira"
-                    style="@style/DayButtonText" />
-
+                    style="@style/DayButtonText"
+                    android:text="Quarta-feira" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -113,14 +98,9 @@
                 android:id="@+id/thursday_button"
                 style="@style/DayButtonStyle"
                 android:layout_marginBottom="16dp">
-
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Quinta-feira"
-                    style="@style/DayButtonText" />
-
+                    style="@style/DayButtonText"
+                    android:text="Quinta-feira" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -136,14 +116,9 @@
                 android:id="@+id/friday_button"
                 style="@style/DayButtonStyle"
                 android:layout_marginBottom="16dp">
-
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sexta-feira"
-                    style="@style/DayButtonText" />
-
+                    style="@style/DayButtonText"
+                    android:text="Sexta-feira" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -159,14 +134,9 @@
                 android:id="@+id/saturday_button"
                 style="@style/DayButtonStyle"
                 android:layout_marginBottom="16dp">
-
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sábado"
-                    style="@style/DayButtonText" />
-
+                    style="@style/DayButtonText"
+                    android:text="Sábado" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -182,14 +152,9 @@
                 android:id="@+id/sunday_button"
                 style="@style/DayButtonStyle"
                 android:layout_marginBottom="24dp">
-
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Domingo"
-                    style="@style/DayButtonText" />
-
+                    style="@style/DayButtonText"
+                    android:text="Domingo" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -203,23 +168,15 @@
 
             <LinearLayout
                 android:id="@+id/back_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/back_button_style"
-                android:padding="12dp"
-                android:gravity="center"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground">
-
+                style="@style/GoldButtonStyle">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="← Voltar"
-                    android:textColor="@color/gold_primary"
+                    android:textColor="@color/button_black"
                     android:textSize="16sp"
+                    android:fontFamily="sans-serif-medium"
                     android:textStyle="bold" />
-
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
@@ -230,5 +187,4 @@
         android:background="@drawable/bottom_decoration"
         android:layout_gravity="center"
         android:alpha="0.6" />
-
 </LinearLayout>

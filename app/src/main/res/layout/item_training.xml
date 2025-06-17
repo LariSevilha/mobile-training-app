@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:padding="12dp"
     android:layout_marginBottom="8dp"
-    android:background="#2D2D2D"
+    android:background="@drawable/input_background"
     android:clickable="true"
     android:focusable="true">
 
@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Nome do Exercício"
-        android:textColor="#CEAC5E"
+        android:textColor="@color/gold_primary"
         android:textSize="16sp"
         android:fontFamily="sans-serif-medium"
         android:textStyle="bold" />
@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Séries: N/A"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/text_primary"
         android:textSize="14sp"
         android:layout_marginTop="4dp" />
 
@@ -33,8 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Repetições: N/A"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/text_primary"
         android:textSize="14sp"
         android:layout_marginTop="4dp" />
-
 </LinearLayout>
