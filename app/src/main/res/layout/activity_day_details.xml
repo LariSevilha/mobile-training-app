@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_black"
+    android:background="#1A1A1A"
     android:orientation="vertical"
     android:padding="24dp"
     android:gravity="center">
@@ -22,14 +23,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Detalhes do Dia"
-        android:textColor="@color/gold_primary"
+        android:textColor="#CEAC5E"
         android:textSize="20sp"
         android:fontFamily="sans-serif-medium"
         android:textStyle="bold"
         android:gravity="center"
         android:layout_marginBottom="24dp" />
 
+    <ImageView
+        android:id="@+id/pdf_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="24dp"
+        android:visibility="gone" />
+
     <ScrollView
+        android:id="@+id/trainings_scroll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -40,17 +50,26 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@drawable/input_background"
-            android:padding="12dp" />
+            android:padding="12dp">
+        </LinearLayout>
     </ScrollView>
 
     <LinearLayout
         android:id="@+id/back_button"
-        style="@style/GoldButtonStyle">
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/button_background"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginBottom="24dp"
+        android:elevation="4dp"
+        android:clickable="true"
+        android:focusable="true">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="← Voltar"
-            android:textColor="@color/button_black"
+            android:textColor="#000000"
             android:textSize="16sp"
             android:fontFamily="sans-serif-medium"
             android:textStyle="bold" />
@@ -59,7 +78,7 @@
     <View
         android:layout_width="80dp"
         android:layout_height="1dp"
-        android:background="@color/gold_primary"
+        android:background="#CEAC5E"
         android:alpha="0.5"
         android:layout_gravity="center"
         android:layout_marginBottom="24dp" />
@@ -68,7 +87,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Renato Frutuoso\ncrf 0000"
-        android:textColor="@color/text_secondary"
+        android:textColor="#94A3B8"
         android:textSize="12sp"
         android:gravity="center" />
 </LinearLayout>
