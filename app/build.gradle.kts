@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose) // Add this to enable the Compose Compiler plugin
+    alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
     id("kotlin-kapt")
 }
@@ -62,7 +62,11 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)
     implementation(libs.androidx.navigation.compose)
-    implementation ("com.google.android.material:material:1.10.0")
+    implementation("com.google.android.material:material:1.11.0")
+
+    // REMOVIDO: Biblioteca AndroidPdfViewer que não funciona mais
+    // implementation(libs.android.pdf.viewer)
+    // implementation("com.github.barteksc:android-pdf-viewer:3.2.0-beta.1")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -71,7 +75,14 @@ dependencies {
     // RecyclerView
     implementation("androidx.recyclerview:recyclerview:1.3.2")
 
-    // Glide
+    // CardView para o layout das páginas do PDF
+    implementation("androidx.cardview:cardview:1.0.0")
+
+    // Coroutines para operações assíncronas
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+
+    // Glide para carregamento de imagens (se necessário)
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
 

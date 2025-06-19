@@ -111,28 +111,6 @@
             android:fontFamily="sans-serif-medium" />
     </LinearLayout>
 
-    <!-- Add logout button -->
-    <LinearLayout
-        android:id="@+id/logout_button"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="@drawable/button_background"
-        android:gravity="center"
-        android:padding="12dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:layout_marginBottom="24dp"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sair"
-            android:textColor="@color/button_black"
-            android:textSize="16sp"
-            android:fontFamily="sans-serif-medium" />
-    </LinearLayout>
-
     <View
         android:layout_width="80dp"
         android:layout_height="1dp"

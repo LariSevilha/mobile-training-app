@@ -1,25 +1,49 @@
 package com.example.trainingappmobile
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.pdf.PdfRenderer
 import android.os.Build
 import android.os.Bundle
+import android.os.ParcelFileDescriptor
 import android.util.Log
+import android.view.View
 import android.view.WindowManager
+import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.annotation.RequiresApi
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.*
+import java.io.File
+import java.io.FileOutputStream
+import java.net.URL
+import javax.net.ssl.HttpsURLConnection
 
 class PdfViewerScreen : ComponentActivity() {
 
-    private lateinit var pdfRenderView: PdfRenderView
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var pageNumberText: TextView
+    private lateinit var totalPagesText: TextView
+    private var pdfRenderer: PdfRenderer? = null
+    private var fileDescriptor: ParcelFileDescriptor? = null
+    private var pdfAdapter: PdfPagesAdapter? = null
+    private var job: Job? = null
+    private var tempFile: File? = null
 
-    @RequiresApi(Build.VERSION_CODES.M)
+    companion object {
+        private const val TAG = "PdfViewerScreen"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // PROTEÇÃO CONTRA SCREENSHOTS E GRAVAÇÃO DE TELA
-        setupSecurityMeasures()
+        // MEDIDAS DE SEGURANÇA MÁXIMAS
+        setupMaximumSecurity()
 
         setContentView(R.layout.activity_pdf_viewer)
 
@@ -27,125 +51,466 @@ class PdfViewerScreen : ComponentActivity() {
         loadPdfContent()
     }
 
-    private fun setupSecurityMeasures() {
-        // Impedir screenshots e gravação de tela
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_SECURE,
-            WindowManager.LayoutParams.FLAG_SECURE
-        )
-
-        // Impedir que o app apareça no recent apps com conteúdo visível
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            setRecentsScreenshotEnabled(false)
-        }
-
-        // Adicionar proteção contra debugging
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+    private fun setupMaximumSecurity() {
+        try {
+            // Impedir screenshots, gravação de tela e captura de conteúdo
             window.setFlags(
-                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
-                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
+                WindowManager.LayoutParams.FLAG_SECURE,
+                WindowManager.LayoutParams.FLAG_SECURE
             )
+
+            // Remover conteúdo do app dos recentes (Android 13+)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                setRecentsScreenshotEnabled(false)
+            }
+
+            // Impedir debugging e inspeção
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                window.setFlags(
+                    WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                    WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
+                )
+            }
+
+            // Impedir captura por aplicativos de terceiros
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao configurar segurança: ${e.message}", e)
         }
     }
 
     private fun initializeViews() {
-        // Botão de voltar
-        val backButton = findViewById<LinearLayout>(R.id.back_button)
-        backButton.setOnClickListener {
-            try {
-                Log.d("PdfViewerScreen", "Voltando para a tela anterior")
+        try {
+            // Botão de voltar
+            val backButton = findViewById<LinearLayout>(R.id.back_button)
+            backButton.setOnClickListener {
                 finish()
-            } catch (e: Exception) {
-                Log.e("PdfViewerScreen", "Erro ao voltar: ${e.message}", e)
-                Toast.makeText(this, "Erro ao voltar", Toast.LENGTH_SHORT).show()
             }
-        }
 
-        // PDF Render View
-        pdfRenderView = findViewById(R.id.pdf_render_view)
+            // Views do PDF
+            recyclerView = findViewById(R.id.pdf_recycler_view)
+            progressBar = findViewById(R.id.progress_bar)
+            pageNumberText = findViewById(R.id.page_number_text)
+            totalPagesText = findViewById(R.id.total_pages_text)
+
+            // Configurar RecyclerView
+            recyclerView.layoutManager = LinearLayoutManager(this)
+            recyclerView.setHasFixedSize(true)
+
+            // Listener para mudança de página
+            recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    updatePageNumber()
+                }
+            })
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao inicializar views: ${e.message}", e)
+            showError("Erro ao inicializar interface")
+        }
+    }
+
+    private fun updatePageNumber() {
+        try {
+            val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
+            layoutManager?.let {
+                val currentPage = it.findFirstVisibleItemPosition() + 1
+                val totalPages = pdfAdapter?.itemCount ?: 0
+                if (currentPage > 0 && totalPages > 0) {
+                    pageNumberText.text = currentPage.toString()
+                    totalPagesText.text = "de $totalPages"
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao atualizar número da página: ${e.message}", e)
+        }
     }
 
     private fun loadPdfContent() {
         val pdfUrl = intent.getStringExtra("PDF_URL")
+        val pdfPath = intent.getStringExtra("PDF_PATH") // Para arquivos locais
 
-        if (pdfUrl.isNullOrEmpty()) {
-            Log.e("PdfViewerScreen", "URL do PDF não fornecida")
-            Toast.makeText(this, "PDF não disponível", Toast.LENGTH_SHORT).show()
-            finish()
+        Log.d(TAG, "=== CARREGANDO PDF ===")
+        Log.d(TAG, "PDF_URL: $pdfUrl")
+        Log.d(TAG, "PDF_PATH: $pdfPath")
+
+        when {
+            !pdfUrl.isNullOrEmpty() -> {
+                Log.d(TAG, "Carregando PDF da URL: $pdfUrl")
+                loadPdfFromUrl(pdfUrl)
+            }
+            !pdfPath.isNullOrEmpty() -> {
+                Log.d(TAG, "Carregando PDF do caminho: $pdfPath")
+                loadPdfFromPath(pdfPath)
+            }
+            else -> {
+                Log.e(TAG, "Nenhuma URL ou caminho do PDF fornecido")
+                showError("PDF não disponível - URL/caminho não fornecido")
+            }
+        }
+    }
+
+    private fun loadPdfFromPath(pdfPath: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            showError("Android 5.0+ necessário para visualizar PDFs")
             return
         }
 
-        // Verificar versão do Android
+        progressBar.visibility = View.VISIBLE
+
+        job = CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val file = File(pdfPath)
+                if (!file.exists()) {
+                    withContext(Dispatchers.Main) {
+                        showError("Arquivo PDF não encontrado")
+                    }
+                    return@launch
+                }
+
+                withContext(Dispatchers.Main) {
+                    renderPdf(file)
+                }
+
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Log.e(TAG, "Erro ao carregar PDF local: ${e.message}", e)
+                    showError("Erro ao carregar PDF: ${e.message}")
+                }
+            }
+        }
+    }
+
+    private fun loadPdfFromUrl(pdfUrl: String) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            Log.e("PdfViewerScreen", "Versão do Android incompatível (requer API 21+ para PdfRenderer)")
-            Toast.makeText(this, "Versão do Android incompatível", Toast.LENGTH_LONG).show()
-            finish()
+            showError("Android 5.0+ necessário para visualizar PDFs")
             return
+        }
+
+        Log.d(TAG, "Verificando versão Android: ${Build.VERSION.SDK_INT}")
+        progressBar.visibility = View.VISIBLE
+
+        job = CoroutineScope(Dispatchers.IO).launch {
+            try {
+                Log.d(TAG, "Iniciando download do PDF: $pdfUrl")
+
+                // Validar URL antes de fazer download
+                if (!isValidUrl(pdfUrl)) {
+                    withContext(Dispatchers.Main) {
+                        showError("URL do PDF inválida")
+                    }
+                    return@launch
+                }
+
+                val downloadedFile = downloadPdfSecurely(pdfUrl)
+                Log.d(TAG, "PDF baixado com sucesso: ${downloadedFile.absolutePath}")
+
+                withContext(Dispatchers.Main) {
+                    renderPdf(downloadedFile)
+                }
+
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Log.e(TAG, "Erro ao processar PDF: ${e.message}", e)
+                    showError("Erro ao carregar PDF: ${e.localizedMessage ?: e.message}")
+                }
+            }
+        }
+    }
+
+    private fun isValidUrl(url: String): Boolean {
+        return try {
+            URL(url)
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "URL inválida: $url", e)
+            false
+        }
+    }
+
+    private suspend fun downloadPdfSecurely(pdfUrl: String): File = withContext(Dispatchers.IO) {
+        Log.d(TAG, "Iniciando download seguro do PDF")
+
+        val url = URL(pdfUrl)
+        val connection = if (pdfUrl.startsWith("https")) {
+            (url.openConnection() as HttpsURLConnection).apply {
+                connectTimeout = 30000
+                readTimeout = 60000
+                setRequestProperty("User-Agent", "TrainingApp-Mobile/1.0")
+                setRequestProperty("Accept", "application/pdf")
+            }
+        } else {
+            (url.openConnection() as java.net.HttpURLConnection).apply {
+                connectTimeout = 30000
+                readTimeout = 60000
+                setRequestProperty("User-Agent", "TrainingApp-Mobile/1.0")
+                setRequestProperty("Accept", "application/pdf")
+            }
         }
 
         try {
-            Log.d("PdfViewerScreen", "Carregando PDF: $pdfUrl")
-            pdfRenderView.loadPdfFromUrl(pdfUrl)
+            connection.connect()
+            Log.d(TAG, "Conexão estabelecida")
+
+            // Verificar código de resposta
+            if (connection is java.net.HttpURLConnection) {
+                val responseCode = connection.responseCode
+                Log.d(TAG, "Código de resposta: $responseCode")
+
+                if (responseCode != 200) {
+                    throw Exception("Erro do servidor: $responseCode - ${connection.responseMessage}")
+                }
+            }
+
+            val contentLength = connection.contentLength
+            Log.d(TAG, "Tamanho do conteúdo: $contentLength bytes")
+
+            if (contentLength > 50 * 1024 * 1024) { // 50MB limit
+                throw Exception("Arquivo muito grande (limite: 50MB)")
+            }
+
+            val contentType = connection.contentType
+            Log.d(TAG, "Tipo de conteúdo: $contentType")
+
+            val input = connection.getInputStream()
+            tempFile = File(cacheDir, "secure_pdf_${System.currentTimeMillis()}.pdf")
+
+            FileOutputStream(tempFile!!).use { output ->
+                val buffer = ByteArray(4096)
+                var bytesRead: Int
+                var totalBytes = 0
+
+                while (input.read(buffer).also { bytesRead = it } != -1) {
+                    output.write(buffer, 0, bytesRead)
+                    totalBytes += bytesRead
+                }
+
+                Log.d(TAG, "Download concluído: $totalBytes bytes")
+            }
+
+            input.close()
+
+            // Verificar se o arquivo foi criado e não está vazio
+            if (!tempFile!!.exists() || tempFile!!.length() == 0L) {
+                throw Exception("Falha ao baixar arquivo PDF")
+            }
+
+            Log.d(TAG, "Arquivo temporário criado: ${tempFile!!.absolutePath}")
+            tempFile!!
+
+        } finally {
+            connection.disconnect()
+        }
+    }
+
+    private fun renderPdf(file: File) {
+        try {
+            Log.d(TAG, "=== RENDERIZANDO PDF ===")
+            Log.d(TAG, "Arquivo: ${file.absolutePath}")
+            Log.d(TAG, "Existe: ${file.exists()}")
+            Log.d(TAG, "Tamanho: ${file.length()} bytes")
+
+            progressBar.visibility = View.VISIBLE
+
+            // Fechar renderer anterior se existir
+            closePdfRenderer()
+
+            // Verificar se o arquivo existe e não está vazio
+            if (!file.exists() || file.length() == 0L) {
+                showError("Arquivo PDF não encontrado ou vazio")
+                return
+            }
+
+            // Abrir o arquivo PDF
+            fileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+            pdfRenderer = PdfRenderer(fileDescriptor!!)
+
+            val pageCount = pdfRenderer!!.pageCount
+            Log.d(TAG, "PDF carregado com sucesso. Páginas: $pageCount")
+
+            if (pageCount == 0) {
+                showError("PDF vazio ou corrompido")
+                return
+            }
+
+            // Configurar o adapter
+            pdfAdapter = PdfPagesAdapter(pdfRenderer!!, pageCount)
+            recyclerView.adapter = pdfAdapter
+
+            // Atualizar contador de páginas
+            totalPagesText.text = "de $pageCount"
+            pageNumberText.text = "1"
+
+            progressBar.visibility = View.GONE
+            Log.d(TAG, "PDF renderizado com sucesso")
+
         } catch (e: Exception) {
-            Log.e("PdfViewerScreen", "Erro ao carregar PDF: ${e.message}", e)
-            Toast.makeText(this, "Erro ao carregar PDF", Toast.LENGTH_SHORT).show()
+            Log.e(TAG, "Erro ao renderizar PDF: ${e.message}", e)
+            showError("Erro ao abrir PDF: ${e.localizedMessage ?: e.message}")
+        }
+    }
+
+    private fun showError(message: String) {
+        Log.e(TAG, "Erro: $message")
+        progressBar.visibility = View.GONE
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+
+        // Aguardar um pouco antes de fechar para o usuário ver a mensagem
+        CoroutineScope(Dispatchers.Main).launch {
+            delay(3000)
             finish()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        // Reforçar proteções quando o app volta ao foco
-        preventScreenshots()
+        reinforceSecurity()
     }
 
     override fun onPause() {
         super.onPause()
-        // Limpar qualquer cache sensível
         clearSensitiveData()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         try {
-            pdfRenderView.close()
-            Log.d("PdfViewerScreen", "PDF viewer fechado e recursos liberados")
+            job?.cancel()
+            closePdfRenderer()
+            clearSensitiveData()
+            Log.d(TAG, "PDF viewer fechado e recursos liberados")
         } catch (e: Exception) {
-            Log.e("PdfViewerScreen", "Erro ao fechar PDF viewer: ${e.message}", e)
+            Log.e(TAG, "Erro ao fechar PDF viewer: ${e.message}", e)
         }
     }
 
-    private fun preventScreenshots() {
-        // Método adicional para reforçar a proteção
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_SECURE,
-            WindowManager.LayoutParams.FLAG_SECURE
-        )
+    private fun reinforceSecurity() {
+        try {
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_SECURE,
+                WindowManager.LayoutParams.FLAG_SECURE
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao reforçar segurança: ${e.message}", e)
+        }
     }
 
     private fun clearSensitiveData() {
-        // Limpar cache de arquivos temporários
         try {
-            val cacheDir = cacheDir
             cacheDir.listFiles()?.forEach { file ->
-                if (file.name.startsWith("temp_pdf_")) {
-                    file.delete()
-                    Log.d("PdfViewerScreen", "Arquivo temporário removido: ${file.name}")
+                if (file.name.startsWith("secure_pdf_")) {
+                    if (file.delete()) {
+                        Log.d(TAG, "Arquivo temporário removido: ${file.name}")
+                    }
                 }
             }
         } catch (e: Exception) {
-            Log.e("PdfViewerScreen", "Erro ao limpar cache: ${e.message}", e)
+            Log.e(TAG, "Erro ao limpar cache: ${e.message}", e)
         }
     }
 
-    // Impedir que o usuário use o botão de voltar do sistema para sair rapidamente
-    override fun onBackPressed() {
+    private fun closePdfRenderer() {
         try {
-            clearSensitiveData()
-            super.onBackPressed()
+            pdfRenderer?.close()
+            fileDescriptor?.close()
         } catch (e: Exception) {
-            Log.e("PdfViewerScreen", "Erro no onBackPressed: ${e.message}", e)
-            finish()
+            Log.e(TAG, "Erro ao fechar PdfRenderer: ${e.message}", e)
+        } finally {
+            pdfRenderer = null
+            fileDescriptor = null
+        }
+    }
+}
+
+// Adapter para as páginas do PDF
+class PdfPagesAdapter(
+    private val pdfRenderer: PdfRenderer,
+    private val pageCount: Int
+) : RecyclerView.Adapter<PdfPagesAdapter.PdfPageViewHolder>() {
+
+    companion object {
+        private const val TAG = "PdfPagesAdapter"
+    }
+
+    class PdfPageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val imageView: ImageView = itemView.findViewById(R.id.page_image_view)
+        val progressBar: ProgressBar = itemView.findViewById(R.id.page_progress_bar)
+        val pageNumberText: TextView = itemView.findViewById(R.id.page_number_small)
+    }
+
+    override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): PdfPageViewHolder {
+        val view = android.view.LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_pdf_page, parent, false)
+        return PdfPageViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: PdfPageViewHolder, position: Int) {
+        holder.pageNumberText.text = "Página ${position + 1}"
+        holder.progressBar.visibility = View.VISIBLE
+        holder.imageView.visibility = View.GONE
+
+        // Renderizar a página em background thread
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val bitmap = renderPage(position)
+
+                // Verificar se a view ainda está válida
+                if (holder.itemView.isAttachedToWindow) {
+                    // Atualizar UI na main thread
+                    CoroutineScope(Dispatchers.Main).launch {
+                        holder.imageView.setImageBitmap(bitmap)
+                        holder.imageView.visibility = View.VISIBLE
+                        holder.progressBar.visibility = View.GONE
+                    }
+                }
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Erro ao renderizar página $position: ${e.message}", e)
+
+                if (holder.itemView.isAttachedToWindow) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        holder.progressBar.visibility = View.GONE
+                        // Mostrar texto de erro
+                        holder.pageNumberText.text = "Erro ao carregar página ${position + 1}"
+                    }
+                }
+            }
+        }
+    }
+
+    override fun getItemCount(): Int = pageCount
+
+    private fun renderPage(pageIndex: Int): Bitmap {
+        val page = pdfRenderer.openPage(pageIndex)
+
+        try {
+            // Calcular dimensões da página
+            val displayMetrics = android.content.res.Resources.getSystem().displayMetrics
+            val screenWidth = displayMetrics.widthPixels - 64 // margin maior
+
+            // Manter aspect ratio
+            val pageWidth = page.width
+            val pageHeight = page.height
+            val aspectRatio = pageHeight.toFloat() / pageWidth.toFloat()
+
+            val bitmapWidth = screenWidth
+            val bitmapHeight = (screenWidth * aspectRatio).toInt()
+
+            // Criar bitmap de alta qualidade
+            val bitmap = Bitmap.createBitmap(
+                bitmapWidth,
+                bitmapHeight,
+                Bitmap.Config.ARGB_8888
+            )
+
+            // Renderizar a página no bitmap
+            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+
+            return bitmap
+
+        } finally {
+            page.close()
         }
     }
 }

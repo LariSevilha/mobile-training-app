@@ -2,9 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_black"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/background_black">
 
     <!-- Saudação -->
     <TextView
@@ -17,6 +17,18 @@
         android:gravity="center"
         android:layout_marginBottom="16dp" />
 
+    <!-- Data de expiração -->
+    <TextView
+        android:id="@+id/plan_expiry_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Data de expiração: N/A"
+        android:textColor="@color/gold_primary"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginBottom="16dp" />
+
     <!-- Botão de Treino -->
     <LinearLayout
         android:id="@+id/training_button"
@@ -27,6 +39,7 @@
         android:padding="12dp"
         android:clickable="true"
         android:focusable="true"
+        android:visibility="gone"
         android:layout_marginBottom="8dp">
 
         <TextView
@@ -47,12 +60,13 @@
         android:padding="12dp"
         android:clickable="true"
         android:focusable="true"
+        android:visibility="gone"
         android:layout_marginBottom="8dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Dietas"
+            android:text="Dieta"
             android:textColor="@color/button_black"
             android:textSize="16sp" />
     </LinearLayout>
@@ -67,34 +81,26 @@
         android:padding="12dp"
         android:clickable="true"
         android:focusable="true"
+        android:visibility="gone"
         android:layout_marginBottom="8dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ver PDF"
+            android:text="PDF"
             android:textColor="@color/button_black"
             android:textSize="16sp" />
     </LinearLayout>
 
-    <!-- Texto de Sem Dados -->
+    <!-- Mensagem de sem dados -->
     <TextView
         android:id="@+id/no_data_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Nenhum dado disponível"
-        android:textColor="@color/error_red"
-        android:gravity="center"
-        android:visibility="gone"
-        android:layout_marginTop="16dp" />
-
-    <!-- Texto de Expiração do Plano -->
-    <TextView
-        android:id="@+id/plan_expiry_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Data de expiração: N/A"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/gold_primary"
+        android:textSize="16sp"
         android:gravity="center"
         android:visibility="gone" />
+
 </LinearLayout>

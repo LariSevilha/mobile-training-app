@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_marginBottom="16dp">
+
+    <!-- Container da página -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="8dp"
+        android:radius="8dp"
+        app:cardBackgroundColor="@android:color/white">
+
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- ImageView para a página renderizada -->
+            <ImageView
+                android:id="@+id/page_image_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:contentDescription="Página do PDF"
+                android:visibility="gone" />
+
+            <!-- Barra de progresso para cada página -->
+            <ProgressBar
+                android:id="@+id/page_progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="64dp"
+                android:indeterminateTint="@color/gold_primary" />
+
+            <!-- Overlay de segurança invisível (impede interações maliciosas) -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </FrameLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Número da página (pequeno) -->
+    <TextView
+        android:id="@+id/page_number_small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:text="Página 1"
+        android:textColor="@color/gold_primary"
+        android:textSize="12sp"
+        android:alpha="0.7" />
+
+</LinearLayout>

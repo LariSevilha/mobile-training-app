@@ -1,79 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_black"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/background_black">
 
-    <!-- Header com botão de voltar -->
+    <!-- Header com botão de voltar e contador de páginas -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/gold_primary"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:background="@color/background_black">
 
+        <!-- Botão de voltar -->
         <LinearLayout
             android:id="@+id/back_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/button_background"
+            android:orientation="horizontal"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="center"
-            android:orientation="horizontal"
+            android:background="?android:attr/selectableItemBackground"
             android:padding="8dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_back"
+                android:contentDescription="Voltar"
+                android:tint="@color/gold_primary" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="← Voltar"
-                android:textColor="@color/button_black"
-                android:textSize="16sp" />
+                android:text="Voltar"
+                android:layout_marginStart="8dp"
+                android:textSize="16sp"
+                android:textColor="@color/gold_primary" />
         </LinearLayout>
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Visualizar PDF"
-            android:textColor="@color/button_black"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <!-- Espaço para manter o título centralizado -->
+        <!-- Espaçador -->
         <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <!-- Contador de páginas -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:minWidth="70dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Página "
+                android:textColor="@color/gold_primary"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/page_number_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textColor="@color/gold_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" "
+                android:textColor="@color/gold_primary"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/total_pages_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="de 0"
+                android:textColor="@color/gold_primary"
+                android:textSize="14sp" />
+        </LinearLayout>
     </LinearLayout>
 
-    <!-- Área do PDF Viewer -->
-    <com.example.trainingappmobile.PdfRenderView
-        android:id="@+id/pdf_render_view"
+    <!-- Linha divisória -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gold_primary"
+        android:alpha="0.3" />
+
+    <!-- Container principal -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@android:color/white" />
+        android:layout_weight="1">
 
-    <!-- Aviso de segurança -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/error_red"
-        android:gravity="center"
-        android:padding="8dp">
+        <!-- RecyclerView para as páginas do PDF -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/pdf_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/background_black"
+            android:padding="16dp"
+            android:clipToPadding="false"
+            tools:listitem="@layout/item_pdf_page" />
 
+        <!-- Barra de progresso -->
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/gold_primary"
+            android:visibility="gone" />
+
+        <!-- Aviso de segurança -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="⚠️ Conteúdo protegido - Screenshots desabilitados"
-            android:textColor="@android:color/white"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="16dp"
+            android:text="🔒 Conteúdo protegido - Screenshots bloqueados"
+            android:textColor="@color/gold_primary"
             android:textSize="12sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+            android:alpha="0.7"
+            android:drawablePadding="4dp" />
+
+    </FrameLayout>
 
 </LinearLayout>
