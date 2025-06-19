@@ -14,6 +14,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import android.view.View
+import android.net.Uri
+import com.google.gson.Gson
 
 class HomeScreen : ComponentActivity() {
 
@@ -49,7 +51,7 @@ class HomeScreen : ComponentActivity() {
             planExpiryText = findViewById(R.id.plan_expiry_text)
         } catch (e: Exception) {
             Log.e(TAG, "Error initializing views: ${e.message}", e)
-            throw e // Re-throw to prevent app from continuing in bad state
+            throw e
         }
     }
 
@@ -94,6 +96,9 @@ class HomeScreen : ComponentActivity() {
 
         call.enqueue(object : Callback<PlanilhaResponse> {
             override fun onResponse(call: Call<PlanilhaResponse>, response: Response<PlanilhaResponse>) {
+                Log.d(TAG, "API Response Code: ${response.code()}")
+                Log.d(TAG, "API Response Message: ${response.message()}")
+
                 if (response.isSuccessful) {
                     val planilhaResponse = response.body()
                     if (planilhaResponse != null) {
@@ -105,6 +110,12 @@ class HomeScreen : ComponentActivity() {
                     }
                 } else {
                     Log.e(TAG, "Request error: ${response.code()} - ${response.message()}")
+                    try {
+                        val errorBody = response.errorBody()?.string()
+                        Log.e(TAG, "Error body: $errorBody")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error reading error body: ${e.message}")
+                    }
                     showNoDataMessage("Error loading data")
                 }
             }
@@ -119,21 +130,55 @@ class HomeScreen : ComponentActivity() {
     private fun updateUI(planilhaResponse: PlanilhaResponse) {
         CoroutineScope(Dispatchers.Main).launch {
             try {
+                Log.d(TAG, "=== INICIANDO UPDATE UI ===")
+
                 val userName = planilhaResponse.name ?: "Usuário"
                 greetingText.text = "Bem-vindo(a), $userName!"
 
-                // Removendo a lógica condicional de visibilidade
-                trainingButton.visibility = View.VISIBLE
-                dietButton.visibility = View.VISIBLE
-                pdfCard.visibility = View.VISIBLE
-                noDataText.visibility = View.GONE // Removendo a exibição automática de "Nenhum dado disponível"
+                val hasTraining = hasTrainingData()
+                val hasDiet = hasDietData()
+                val hasPdf = hasPdfData()
+
+                Log.d(TAG, "Has training data: $hasTraining")
+                Log.d(TAG, "Has diet data: $hasDiet")
+                Log.d(TAG, "Has PDF data: $hasPdf")
+
+                if (hasPdf && !hasTraining && !hasDiet) {
+                    // Caso de upload (apenas PDF)
+                    pdfCard.visibility = View.VISIBLE
+                    trainingButton.visibility = View.GONE
+                    dietButton.visibility = View.GONE
+                    Log.d(TAG, "Modo Upload: Apenas PDF visível")
+                } else if ((hasTraining || hasDiet) && !hasPdf) {
+                    // Caso de cadastro manual (treino ou dieta)
+                    trainingButton.visibility = if (hasTraining) View.VISIBLE else View.GONE
+                    dietButton.visibility = if (hasDiet) View.VISIBLE else View.GONE
+                    pdfCard.visibility = View.GONE
+                    Log.d(TAG, "Modo Manual: Treino e/ou Dieta visíveis")
+                } else if (hasPdf && (hasTraining || hasDiet)) {
+                    // Caso misto (priorizar PDF com aviso)
+                    pdfCard.visibility = View.VISIBLE
+                    trainingButton.visibility = View.GONE
+                    dietButton.visibility = View.GONE
+                    noDataText.visibility = View.VISIBLE
+                    noDataText.text = "Atenção: Dados mistos (PDF priorizado)"
+                    Log.d(TAG, "Modo Misto: PDF visível com aviso")
+                } else {
+                    // Sem dados ou erro
+                    trainingButton.visibility = View.GONE
+                    dietButton.visibility = View.GONE
+                    pdfCard.visibility = View.GONE
+                    noDataText.visibility = View.VISIBLE
+                    noDataText.text = "Nenhum dado disponível"
+                    Log.d(TAG, "Sem dados: Nenhum botão visível")
+                }
 
                 planilhaResponse.expirationDate?.let { expirationDate ->
                     planExpiryText.text = "Data de expiração: $expirationDate"
                     planExpiryText.visibility = View.VISIBLE
                 } ?: run { planExpiryText.visibility = View.GONE }
 
-                Log.d(TAG, "UI updated successfully")
+                Log.d(TAG, "=== UI UPDATE COMPLETED ===")
 
             } catch (e: Exception) {
                 Log.e(TAG, "Error updating UI: ${e.message}", e)
@@ -143,17 +188,26 @@ class HomeScreen : ComponentActivity() {
     }
 
     private fun hasTrainingData(): Boolean {
-        return currentPlanilhaData?.getTrainingsSafe()?.isNotEmpty() == true
+        val trainings = currentPlanilhaData?.getTrainingsSafe() ?: emptyList()
+        val hasData = trainings.isNotEmpty()
+        Log.d(TAG, "hasTrainingData: $hasData (${trainings.size} trainings)")
+        return hasData
     }
 
     private fun hasDietData(): Boolean {
-        return currentPlanilhaData?.getMealsSafe()?.isNotEmpty() == true
+        val meals = currentPlanilhaData?.getMealsSafe() ?: emptyList()
+        val hasData = meals.isNotEmpty()
+        Log.d(TAG, "hasDietData: $hasData (${meals.size} meals)")
+        return hasData
     }
 
     private fun hasPdfData(): Boolean {
         val pdfs = currentPlanilhaData?.getWeeklyPdfsSafe() ?: emptyList()
         val hasValidPdf = pdfs.any { it.hasValidUrl() }
         Log.d(TAG, "hasPdfData: $hasValidPdf, PDFs count: ${pdfs.size}")
+        pdfs.forEachIndexed { index, pdf ->
+            Log.d(TAG, "PDF $index: url=${pdf.pdfUrl}, valid=${pdf.hasValidUrl()}")
+        }
         return hasValidPdf
     }
 
@@ -174,8 +228,10 @@ class HomeScreen : ComponentActivity() {
                 return
             }
 
+            noDataText.visibility = View.GONE
+
             val intent = Intent(this, PdfViewerScreen::class.java)
-            intent.putExtra("PDF_URL", validPdf.pdfUrl)
+            intent.putExtra("PDF_URL", validPdf.getFullUrl())
             validPdf.weekday?.let { intent.putExtra("WEEKDAY", it) }
             startActivity(intent)
 
@@ -195,6 +251,7 @@ class HomeScreen : ComponentActivity() {
 
     private fun showNoDataMessage(message: String) {
         CoroutineScope(Dispatchers.Main).launch {
+            Log.d(TAG, "Showing no data message: $message")
             noDataText.text = message
             noDataText.visibility = View.VISIBLE
             Toast.makeText(this@HomeScreen, message, Toast.LENGTH_SHORT).show()
@@ -205,6 +262,21 @@ class HomeScreen : ComponentActivity() {
         super.onResume()
         if (currentPlanilhaData == null) {
             loadUserData()
+        }
+    }
+}
+
+// Extensões para WeeklyPdf
+fun WeeklyPdf.hasValidUrl(): Boolean {
+    return !pdfUrl.isNullOrEmpty() && Uri.parse(getFullUrl()).isHierarchical
+}
+
+fun WeeklyPdf.getFullUrl(): String {
+    return if (pdfUrl?.startsWith("http") == true || pdfUrl?.startsWith("https") == true) {
+        pdfUrl!!
+    } else {
+        "${RetrofitClient.BASE_URL}${pdfUrl ?: ""}".also {
+            Log.d("WeeklyPdf", "Construída URL: $it")
         }
     }
 }

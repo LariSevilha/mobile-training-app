@@ -42,9 +42,7 @@ class PdfViewerScreen : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // MEDIDAS DE SEGURANÇA MÁXIMAS
         setupMaximumSecurity()
-
         setContentView(R.layout.activity_pdf_viewer)
 
         initializeViews()
@@ -53,18 +51,15 @@ class PdfViewerScreen : ComponentActivity() {
 
     private fun setupMaximumSecurity() {
         try {
-            // Impedir screenshots, gravação de tela e captura de conteúdo
             window.setFlags(
                 WindowManager.LayoutParams.FLAG_SECURE,
                 WindowManager.LayoutParams.FLAG_SECURE
             )
 
-            // Remover conteúdo do app dos recentes (Android 13+)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 setRecentsScreenshotEnabled(false)
             }
 
-            // Impedir debugging e inspeção
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 window.setFlags(
                     WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
@@ -72,7 +67,6 @@ class PdfViewerScreen : ComponentActivity() {
                 )
             }
 
-            // Impedir captura por aplicativos de terceiros
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 
         } catch (e: Exception) {
@@ -82,23 +76,17 @@ class PdfViewerScreen : ComponentActivity() {
 
     private fun initializeViews() {
         try {
-            // Botão de voltar
             val backButton = findViewById<LinearLayout>(R.id.back_button)
-            backButton.setOnClickListener {
-                finish()
-            }
+            backButton.setOnClickListener { finish() }
 
-            // Views do PDF
             recyclerView = findViewById(R.id.pdf_recycler_view)
             progressBar = findViewById(R.id.progress_bar)
             pageNumberText = findViewById(R.id.page_number_text)
             totalPagesText = findViewById(R.id.total_pages_text)
 
-            // Configurar RecyclerView
             recyclerView.layoutManager = LinearLayoutManager(this)
             recyclerView.setHasFixedSize(true)
 
-            // Listener para mudança de página
             recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
@@ -129,21 +117,15 @@ class PdfViewerScreen : ComponentActivity() {
 
     private fun loadPdfContent() {
         val pdfUrl = intent.getStringExtra("PDF_URL")
-        val pdfPath = intent.getStringExtra("PDF_PATH") // Para arquivos locais
+        val pdfPath = intent.getStringExtra("PDF_PATH")
 
         Log.d(TAG, "=== CARREGANDO PDF ===")
         Log.d(TAG, "PDF_URL: $pdfUrl")
         Log.d(TAG, "PDF_PATH: $pdfPath")
 
         when {
-            !pdfUrl.isNullOrEmpty() -> {
-                Log.d(TAG, "Carregando PDF da URL: $pdfUrl")
-                loadPdfFromUrl(pdfUrl)
-            }
-            !pdfPath.isNullOrEmpty() -> {
-                Log.d(TAG, "Carregando PDF do caminho: $pdfPath")
-                loadPdfFromPath(pdfPath)
-            }
+            !pdfUrl.isNullOrEmpty() -> loadPdfFromUrl(pdfUrl)
+            !pdfPath.isNullOrEmpty() -> loadPdfFromPath(pdfPath)
             else -> {
                 Log.e(TAG, "Nenhuma URL ou caminho do PDF fornecido")
                 showError("PDF não disponível - URL/caminho não fornecido")
@@ -172,7 +154,6 @@ class PdfViewerScreen : ComponentActivity() {
                 withContext(Dispatchers.Main) {
                     renderPdf(file)
                 }
-
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Log.e(TAG, "Erro ao carregar PDF local: ${e.message}", e)
@@ -195,7 +176,6 @@ class PdfViewerScreen : ComponentActivity() {
             try {
                 Log.d(TAG, "Iniciando download do PDF: $pdfUrl")
 
-                // Validar URL antes de fazer download
                 if (!isValidUrl(pdfUrl)) {
                     withContext(Dispatchers.Main) {
                         showError("URL do PDF inválida")
@@ -209,7 +189,6 @@ class PdfViewerScreen : ComponentActivity() {
                 withContext(Dispatchers.Main) {
                     renderPdf(downloadedFile)
                 }
-
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Log.e(TAG, "Erro ao processar PDF: ${e.message}", e)
@@ -230,7 +209,7 @@ class PdfViewerScreen : ComponentActivity() {
     }
 
     private suspend fun downloadPdfSecurely(pdfUrl: String): File = withContext(Dispatchers.IO) {
-        Log.d(TAG, "Iniciando download seguro do PDF")
+        Log.d(TAG, "Iniciando download seguro do PDF: $pdfUrl")
 
         val url = URL(pdfUrl)
         val connection = if (pdfUrl.startsWith("https")) {
@@ -253,13 +232,13 @@ class PdfViewerScreen : ComponentActivity() {
             connection.connect()
             Log.d(TAG, "Conexão estabelecida")
 
-            // Verificar código de resposta
             if (connection is java.net.HttpURLConnection) {
                 val responseCode = connection.responseCode
                 Log.d(TAG, "Código de resposta: $responseCode")
 
                 if (responseCode != 200) {
-                    throw Exception("Erro do servidor: $responseCode - ${connection.responseMessage}")
+                    Log.e(TAG, "Falha no download: $responseCode - ${connection.responseMessage}")
+                    throw Exception("Erro do servidor: $responseCode")
                 }
             }
 
@@ -291,7 +270,6 @@ class PdfViewerScreen : ComponentActivity() {
 
             input.close()
 
-            // Verificar se o arquivo foi criado e não está vazio
             if (!tempFile!!.exists() || tempFile!!.length() == 0L) {
                 throw Exception("Falha ao baixar arquivo PDF")
             }
@@ -313,16 +291,13 @@ class PdfViewerScreen : ComponentActivity() {
 
             progressBar.visibility = View.VISIBLE
 
-            // Fechar renderer anterior se existir
             closePdfRenderer()
 
-            // Verificar se o arquivo existe e não está vazio
             if (!file.exists() || file.length() == 0L) {
                 showError("Arquivo PDF não encontrado ou vazio")
                 return
             }
 
-            // Abrir o arquivo PDF
             fileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
             pdfRenderer = PdfRenderer(fileDescriptor!!)
 
@@ -334,11 +309,9 @@ class PdfViewerScreen : ComponentActivity() {
                 return
             }
 
-            // Configurar o adapter
             pdfAdapter = PdfPagesAdapter(pdfRenderer!!, pageCount)
             recyclerView.adapter = pdfAdapter
 
-            // Atualizar contador de páginas
             totalPagesText.text = "de $pageCount"
             pageNumberText.text = "1"
 
@@ -356,7 +329,6 @@ class PdfViewerScreen : ComponentActivity() {
         progressBar.visibility = View.GONE
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
 
-        // Aguardar um pouco antes de fechar para o usuário ver a mensagem
         CoroutineScope(Dispatchers.Main).launch {
             delay(3000)
             finish()
@@ -450,28 +422,23 @@ class PdfPagesAdapter(
         holder.progressBar.visibility = View.VISIBLE
         holder.imageView.visibility = View.GONE
 
-        // Renderizar a página em background thread
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val bitmap = renderPage(position)
 
-                // Verificar se a view ainda está válida
                 if (holder.itemView.isAttachedToWindow) {
-                    // Atualizar UI na main thread
                     CoroutineScope(Dispatchers.Main).launch {
                         holder.imageView.setImageBitmap(bitmap)
                         holder.imageView.visibility = View.VISIBLE
                         holder.progressBar.visibility = View.GONE
                     }
                 }
-
             } catch (e: Exception) {
                 Log.e(TAG, "Erro ao renderizar página $position: ${e.message}", e)
 
                 if (holder.itemView.isAttachedToWindow) {
                     CoroutineScope(Dispatchers.Main).launch {
                         holder.progressBar.visibility = View.GONE
-                        // Mostrar texto de erro
                         holder.pageNumberText.text = "Erro ao carregar página ${position + 1}"
                     }
                 }
@@ -485,11 +452,9 @@ class PdfPagesAdapter(
         val page = pdfRenderer.openPage(pageIndex)
 
         try {
-            // Calcular dimensões da página
             val displayMetrics = android.content.res.Resources.getSystem().displayMetrics
             val screenWidth = displayMetrics.widthPixels - 64 // margin maior
 
-            // Manter aspect ratio
             val pageWidth = page.width
             val pageHeight = page.height
             val aspectRatio = pageHeight.toFloat() / pageWidth.toFloat()
@@ -497,18 +462,15 @@ class PdfPagesAdapter(
             val bitmapWidth = screenWidth
             val bitmapHeight = (screenWidth * aspectRatio).toInt()
 
-            // Criar bitmap de alta qualidade
             val bitmap = Bitmap.createBitmap(
                 bitmapWidth,
                 bitmapHeight,
                 Bitmap.Config.ARGB_8888
             )
 
-            // Renderizar a página no bitmap
             page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
 
             return bitmap
-
         } finally {
             page.close()
         }

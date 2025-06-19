@@ -1,5 +1,6 @@
 package com.example.trainingappmobile
 
+import android.util.Log
 import com.google.gson.annotations.SerializedName
 
 data class PlanilhaResponse(
@@ -16,10 +17,29 @@ data class PlanilhaResponse(
     @SerializedName("meals") val meals: List<Meal>? = null,
     @SerializedName("weekly_pdfs") val weeklyPdfs: List<WeeklyPdf>? = null
 ) {
+    companion object {
+        private const val TAG = "PlanilhaResponse"
+    }
+
     fun hasError(): Boolean = !error.isNullOrEmpty()
-    fun getTrainingsSafe(): List<Training> = trainings ?: emptyList()
-    fun getMealsSafe(): List<Meal> = meals ?: emptyList()
-    fun getWeeklyPdfsSafe(): List<WeeklyPdf> = weeklyPdfs ?: emptyList()
+
+    fun getTrainingsSafe(): List<Training> {
+        val trainings = trainings ?: emptyList()
+        Log.d(TAG, "getTrainingsSafe: ${trainings.size} treinos encontrados")
+        return trainings
+    }
+
+    fun getMealsSafe(): List<Meal> {
+        val meals = meals ?: emptyList()
+        Log.d(TAG, "getMealsSafe: ${meals.size} refeições encontradas")
+        return meals
+    }
+
+    fun getWeeklyPdfsSafe(): List<WeeklyPdf> {
+        val pdfs = weeklyPdfs ?: emptyList()
+        Log.d(TAG, "getWeeklyPdfsSafe: ${pdfs.size} PDFs encontrados")
+        return pdfs
+    }
 }
 
 data class Training(
@@ -32,19 +52,11 @@ data class Training(
     @SerializedName("weekday") val weekday: String? = null,
     @SerializedName("photo_urls") val photoUrls: List<String>? = null
 ) {
-    fun getExerciseNameSafe(): String = exerciseName ?: "Exercício não especificado"
+    fun getExerciseNameSafe(): String = exerciseName ?: "Nome do exercício não definido"
+    fun getSeriesRepetitionsText(): String = "Séries: ${serieAmount ?: 0}, Repetições: ${repeatAmount ?: 0}"
     fun hasVideo(): Boolean = !video.isNullOrEmpty()
     fun hasPhotos(): Boolean = !photoUrls.isNullOrEmpty()
     fun getPhotoUrlsSafe(): List<String> = photoUrls ?: emptyList()
-    fun getSeriesRepetitionsText(): String {
-        val series = serieAmount ?: 0
-        val reps = repeatAmount ?: 0
-        return if (series > 0 && reps > 0) {
-            "${series}x${reps}"
-        } else {
-            "Não especificado"
-        }
-    }
 }
 
 data class Meal(
@@ -53,9 +65,8 @@ data class Meal(
     @SerializedName("weekday") val weekday: String? = null,
     @SerializedName("comidas") val comidas: List<Comida>? = null
 ) {
-    fun getMealTypeSafe(): String = mealType ?: "Refeição"
+    fun getMealTypeSafe(): String = mealType ?: "Tipo de refeição não definido"
     fun getComidasSafe(): List<Comida> = comidas ?: emptyList()
-    fun hasComidas(): Boolean = !comidas.isNullOrEmpty()
 }
 
 data class Comida(
@@ -63,15 +74,7 @@ data class Comida(
     @SerializedName("name") val name: String? = null,
     @SerializedName("amount") val amount: Int? = null
 ) {
-    fun getNameSafe(): String = name ?: "Alimento não especificado"
-    fun getAmountText(): String {
-        return if (amount != null && amount > 0) {
-            "${amount}g"
-        } else {
-            "Quantidade não especificada"
-        }
-    }
-    fun getFullDescription(): String = "${getNameSafe()} - ${getAmountText()}"
+    fun getFullDescription(): String = "${name ?: "Comida não definida"} - Quantidade: ${amount ?: 0}"
 }
 
 data class WeeklyPdf(
@@ -79,42 +82,5 @@ data class WeeklyPdf(
     @SerializedName("weekday") val weekday: String? = null,
     @SerializedName("pdf_url") val pdfUrl: String? = null
 ) {
-    fun hasValidUrl(): Boolean = !pdfUrl.isNullOrEmpty()
-    fun getWeekdaySafe(): String = weekday ?: "Dia não especificado"
-}
-
-enum class Weekday(val displayName: String) {
-    MONDAY("Segunda-feira"),
-    TUESDAY("Terça-feira"),
-    WEDNESDAY("Quarta-feira"),
-    THURSDAY("Quinta-feira"),
-    FRIDAY("Sexta-feira"),
-    SATURDAY("Sábado"),
-    SUNDAY("Domingo");
-
-    companion object {
-        fun fromString(value: String?): Weekday? {
-            return values().find {
-                it.name.equals(value, ignoreCase = true) ||
-                        it.displayName.equals(value, ignoreCase = true)
-            }
-        }
-    }
-}
-
-enum class MealType(val displayName: String) {
-    BREAKFAST("Café da manhã"),
-    LUNCH("Almoço"),
-    SNACK("Lanche"),
-    DINNER("Jantar"),
-    SUPPER("Ceia");
-
-    companion object {
-        fun fromString(value: String?): MealType? {
-            return values().find {
-                it.name.equals(value, ignoreCase = true) ||
-                        it.displayName.equals(value, ignoreCase = true)
-            }
-        }
-    }
+    fun getWeekdaySafe(): String = weekday ?: "Dia não definido"
 }
