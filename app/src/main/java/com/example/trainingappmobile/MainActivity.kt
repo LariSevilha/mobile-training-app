@@ -6,7 +6,9 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.View
+import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -19,15 +21,20 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
-        private const val PREF_NAME = "app_prefs" // Alinhado com HomeScreen
-        private const val KEY_AUTH_TOKEN = "auth_token" // Alinhado com HomeScreen
-        private const val KEY_DEVICE_ID = "device_id" // Alinhado com HomeScreen
+        private const val PREF_NAME = "app_prefs"
+        private const val KEY_AUTH_TOKEN = "auth_token"
+        private const val KEY_DEVICE_ID = "device_id"
+        private const val KEY_REMEMBER_ME = "remember_me"
+        private const val KEY_SAVED_EMAIL = "saved_email"
+        private const val KEY_SAVED_PASSWORD = "saved_password"
     }
 
     private lateinit var sharedPrefs: SharedPreferences
     private lateinit var emailEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var loginButton: LinearLayout
+    private lateinit var rememberMeCheckbox: CheckBox
+    private lateinit var passwordToggle: ImageView
     private var authToken: String? = null
     private var deviceId: String? = null
 
@@ -37,6 +44,7 @@ class MainActivity : AppCompatActivity() {
 
         initViews()
         initSharedPreferences()
+        setupListeners()
 
         authToken = sharedPrefs.getString(KEY_AUTH_TOKEN, null)
         deviceId = sharedPrefs.getString(KEY_DEVICE_ID, null)
@@ -44,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         if (authToken != null && deviceId != null) {
             navigateToHome()
         } else {
+            loadSavedCredentials()
             showLoginState()
         }
     }
@@ -52,21 +61,28 @@ class MainActivity : AppCompatActivity() {
         emailEditText = findViewById(R.id.email_edit_text)
         passwordEditText = findViewById(R.id.password_edit_text)
         loginButton = findViewById(R.id.login_button)
+        rememberMeCheckbox = findViewById(R.id.remember_me_checkbox)
+        passwordToggle = findViewById(R.id.password_toggle)
     }
 
     private fun initSharedPreferences() {
         sharedPrefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE)
     }
 
-    private fun setupLoginButton() {
+    private fun setupListeners() {
         loginButton.setOnClickListener {
             val email = emailEditText.text.toString().trim()
             val password = passwordEditText.text.toString().trim()
 
             if (validateInput(email, password)) {
                 val deviceId = getSecureDeviceId()
+                saveCredentialsIfRemembered(email, password)
                 login(email, password, deviceId)
             }
+        }
+
+        passwordToggle.setOnClickListener {
+            togglePasswordVisibility()
         }
     }
 
@@ -150,6 +166,33 @@ class MainActivity : AppCompatActivity() {
             .apply()
     }
 
+    private fun saveCredentialsIfRemembered(email: String, password: String) {
+        if (rememberMeCheckbox.isChecked) {
+            sharedPrefs.edit()
+                .putBoolean(KEY_REMEMBER_ME, true)
+                .putString(KEY_SAVED_EMAIL, email)
+                .putString(KEY_SAVED_PASSWORD, password)
+                .apply()
+        } else {
+            sharedPrefs.edit()
+                .putBoolean(KEY_REMEMBER_ME, false)
+                .remove(KEY_SAVED_EMAIL)
+                .remove(KEY_SAVED_PASSWORD)
+                .apply()
+        }
+    }
+
+    private fun loadSavedCredentials() {
+        val rememberMe = sharedPrefs.getBoolean(KEY_REMEMBER_ME, false)
+        rememberMeCheckbox.isChecked = rememberMe
+        if (rememberMe) {
+            val savedEmail = sharedPrefs.getString(KEY_SAVED_EMAIL, "")
+            val savedPassword = sharedPrefs.getString(KEY_SAVED_PASSWORD, "")
+            emailEditText.setText(savedEmail)
+            passwordEditText.setText(savedPassword)
+        }
+    }
+
     private fun clearCredentials() {
         sharedPrefs.edit().clear().apply()
         authToken = null
@@ -168,7 +211,6 @@ class MainActivity : AppCompatActivity() {
         loginButton.visibility = View.VISIBLE
         emailEditText.visibility = View.VISIBLE
         passwordEditText.visibility = View.VISIBLE
-        setupLoginButton()
     }
 
     private fun navigateToHome() {
@@ -179,5 +221,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun togglePasswordVisibility() {
+        val isPasswordVisible = passwordEditText.inputType == android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+        if (isPasswordVisible) {
+            passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+            passwordToggle.setImageResource(R.drawable.ic_eye) // Replace with closed eye drawable
+        } else {
+            passwordEditText.inputType = android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            passwordToggle.setImageResource(R.drawable.ic_eye_open) // Replace with open eye drawable
+        }
+        passwordEditText.setSelection(passwordEditText.text.length) // Move cursor to end
     }
 }

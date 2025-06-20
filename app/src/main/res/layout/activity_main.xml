@@ -35,21 +35,49 @@
         android:background="@drawable/input_background"
         android:padding="12dp"
         android:layout_marginBottom="16dp"
-        android:gravity="center"
         android:inputType="textEmailAddress" />
 
-    <EditText
-        android:id="@+id/password_edit_text"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:hint="Senha"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#94A3B8"
         android:background="@drawable/input_background"
-        android:padding="12dp"
-        android:layout_marginBottom="16dp"
-        android:gravity="center"
-        android:inputType="textPassword" />
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <EditText
+            android:id="@+id/password_edit_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:hint="Senha"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#94A3B8"
+            android:padding="12dp"
+            android:inputType="textPassword" />
+
+<!--        <EditText-->
+<!--            android:id="@+id/passwordEditText"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="@android:color/transparent"-->
+<!--            android:hint="Senha"-->
+<!--            android:textColorHint="#CCCCCC"-->
+<!--            android:inputType="textPassword"-->
+<!--            android:padding="12dp"-->
+<!--            android:textColor="#FFFFFF" />-->
+
+
+        <ImageView
+            android:id="@+id/password_toggle"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_eye"
+            android:padding="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -67,8 +95,9 @@
                 android:id="@+id/remember_me_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:buttonTint="#CEAC5E"
-                android:layout_marginEnd="8dp" />
+                android:layout_marginEnd="8dp"
+                android:button="@drawable/checkbox_custom" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -77,20 +106,8 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Esqueceu sua senha?"
-            android:textColor="#94A3B8"
-            android:textSize="14sp"
-            android:gravity="end|center_vertical"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?android:attr/selectableItemBackground" />
     </LinearLayout>
 
-    <!-- Changed from Button to LinearLayout to match your Kotlin code -->
     <LinearLayout
         android:id="@+id/login_button"
         android:layout_width="match_parent"
@@ -122,7 +139,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Renato Frutuoso\n crf 0000"
+        android:text="Renato Frutuoso\n 013025 G/MS"
         android:textColor="#94A3B8"
         android:textSize="12sp"
         android:gravity="center" />

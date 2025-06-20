@@ -86,7 +86,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Renato Frutuoso\ncrf 0000"
+        android:text="Renato Frutuoso\n013025 G/MS"
         android:textColor="#94A3B8"
         android:textSize="12sp"
         android:gravity="center" />

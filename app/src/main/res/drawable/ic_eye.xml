@@ -1,0 +1,19 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Olho base (sem íris) -->
+    <path
+        android:pathData="M12,4.5C7,4.5 2.73,7.61 1,11.5C2.73,15.39 7,18.5 12,18.5C17,18.5 21.27,15.39 23,11.5C21.27,7.61 17,4.5 12,4.5Z"
+        android:fillColor="#CEAC5E"
+        android:strokeWidth="1"
+        android:strokeColor="#CEAC5E" />
+
+    <!-- Linha diagonal cruzando o olho -->
+    <path
+        android:pathData="M4,4L20,20"
+        android:strokeWidth="2"
+        android:strokeColor="#CEAC5E" />
+</vector>
