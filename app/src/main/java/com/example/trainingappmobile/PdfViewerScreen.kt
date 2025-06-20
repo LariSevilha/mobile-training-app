@@ -210,12 +210,17 @@ class PdfViewerScreen : ComponentActivity() {
 
     private suspend fun downloadPdfSecurely(pdfUrl: String): File = withContext(Dispatchers.IO) {
         Log.d(TAG, "Iniciando download seguro do PDF: $pdfUrl")
+        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        val token = prefs.getString("auth_token", null) ?: throw Exception("Token não encontrado")
+        val deviceId = prefs.getString("device_id", null) ?: throw Exception("Device ID não encontrado")
 
         val url = URL(pdfUrl)
         val connection = if (pdfUrl.startsWith("https")) {
             (url.openConnection() as HttpsURLConnection).apply {
                 connectTimeout = 30000
                 readTimeout = 60000
+                setRequestProperty("Authorization", "Bearer $token")
+                setRequestProperty("Device-ID", deviceId)
                 setRequestProperty("User-Agent", "TrainingApp-Mobile/1.0")
                 setRequestProperty("Accept", "application/pdf")
             }
@@ -223,6 +228,8 @@ class PdfViewerScreen : ComponentActivity() {
             (url.openConnection() as java.net.HttpURLConnection).apply {
                 connectTimeout = 30000
                 readTimeout = 60000
+                setRequestProperty("Authorization", "Bearer $token")
+                setRequestProperty("Device-ID", deviceId)
                 setRequestProperty("User-Agent", "TrainingApp-Mobile/1.0")
                 setRequestProperty("Accept", "application/pdf")
             }
@@ -231,57 +238,36 @@ class PdfViewerScreen : ComponentActivity() {
         try {
             connection.connect()
             Log.d(TAG, "Conexão estabelecida")
-
             if (connection is java.net.HttpURLConnection) {
                 val responseCode = connection.responseCode
                 Log.d(TAG, "Código de resposta: $responseCode")
-
                 if (responseCode != 200) {
-                    Log.e(TAG, "Falha no download: $responseCode - ${connection.responseMessage}")
-                    throw Exception("Erro do servidor: $responseCode")
+                    throw Exception("Erro do servidor: $responseCode - ${connection.responseMessage}")
                 }
             }
 
-            val contentLength = connection.contentLength
-            Log.d(TAG, "Tamanho do conteúdo: $contentLength bytes")
-
-            if (contentLength > 50 * 1024 * 1024) { // 50MB limit
-                throw Exception("Arquivo muito grande (limite: 50MB)")
-            }
-
-            val contentType = connection.contentType
-            Log.d(TAG, "Tipo de conteúdo: $contentType")
-
             val input = connection.getInputStream()
             tempFile = File(cacheDir, "secure_pdf_${System.currentTimeMillis()}.pdf")
-
             FileOutputStream(tempFile!!).use { output ->
                 val buffer = ByteArray(4096)
                 var bytesRead: Int
                 var totalBytes = 0
-
                 while (input.read(buffer).also { bytesRead = it } != -1) {
                     output.write(buffer, 0, bytesRead)
                     totalBytes += bytesRead
                 }
-
                 Log.d(TAG, "Download concluído: $totalBytes bytes")
             }
-
             input.close()
 
             if (!tempFile!!.exists() || tempFile!!.length() == 0L) {
                 throw Exception("Falha ao baixar arquivo PDF")
             }
-
-            Log.d(TAG, "Arquivo temporário criado: ${tempFile!!.absolutePath}")
             tempFile!!
-
         } finally {
             connection.disconnect()
         }
     }
-
     private fun renderPdf(file: File) {
         try {
             Log.d(TAG, "=== RENDERIZANDO PDF ===")
