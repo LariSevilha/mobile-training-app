@@ -6,8 +6,10 @@ import android.util.Log
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.ImageView
 import androidx.activity.ComponentActivity
 import androidx.cardview.widget.CardView
+import androidx.appcompat.app.AlertDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,7 +18,13 @@ import retrofit2.Callback
 import retrofit2.Response
 import android.view.View
 import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import com.google.gson.Gson
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class HomeScreen : ComponentActivity() {
 
@@ -26,8 +34,9 @@ class HomeScreen : ComponentActivity() {
     private lateinit var pdfCard: LinearLayout
     private lateinit var noDataText: TextView
     private lateinit var planExpiryText: TextView
+    private lateinit var alertIcon: ImageView
+    private lateinit var logoutIcon: ImageView
 
-    // CardViews para controlar visibilidade
     private lateinit var trainingCardView: CardView
     private lateinit var dietCardView: CardView
     private lateinit var pdfCardView: CardView
@@ -48,23 +57,18 @@ class HomeScreen : ComponentActivity() {
     }
 
     private fun initializeViews() {
-        try {
-            greetingText = findViewById(R.id.greeting_text)
-            trainingButton = findViewById(R.id.training_button)
-            dietButton = findViewById(R.id.diet_button)
-            pdfCard = findViewById(R.id.pdf_card)
-            noDataText = findViewById(R.id.no_data_text)
-            planExpiryText = findViewById(R.id.plan_expiry_text)
+        greetingText = findViewById(R.id.greeting_text)
+        trainingButton = findViewById(R.id.training_button)
+        dietButton = findViewById(R.id.diet_button)
+        pdfCard = findViewById(R.id.pdf_card)
+        noDataText = findViewById(R.id.no_data_text)
+        planExpiryText = findViewById(R.id.plan_expiry_text)
+        alertIcon = findViewById(R.id.alert_icon)
+        logoutIcon = findViewById(R.id.logout_icon)
 
-            // CardViews
-            trainingCardView = findViewById(R.id.training_card)
-            dietCardView = findViewById(R.id.diet_card)
-            pdfCardView = findViewById(R.id.pdf_card_container)
-
-        } catch (e: Exception) {
-            Log.e(TAG, "Error initializing views: ${e.message}", e)
-            throw e
-        }
+        trainingCardView = findViewById(R.id.training_card)
+        dietCardView = findViewById(R.id.diet_card)
+        pdfCardView = findViewById(R.id.pdf_card_container)
     }
 
     private fun setupClickListeners() {
@@ -87,6 +91,102 @@ class HomeScreen : ComponentActivity() {
         pdfCard.setOnClickListener {
             openPdfViewer()
         }
+
+        alertIcon.setOnClickListener {
+            showRemainingDaysDialog()
+        }
+
+        logoutIcon.setOnClickListener {
+            showLogoutDialog()
+        }
+    }
+
+    private fun showRemainingDaysDialog() {
+        val expirationDate = currentPlanilhaData?.expirationDate
+        if (expirationDate.isNullOrEmpty()) {
+            Toast.makeText(this, "Data de expiração não disponível", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val remainingDays = calculateRemainingDays(expirationDate)
+        val message = when {
+            remainingDays > 1 -> "Restam $remainingDays dias para o fim do seu plano"
+            remainingDays == 1 -> "Resta 1 dia para o fim do seu plano"
+            remainingDays == 0 -> "Seu plano expira hoje!"
+            else -> "Seu plano expirou há ${Math.abs(remainingDays)} dias"
+        }
+
+        val title = when {
+            remainingDays > 7 -> "Status do Plano - Ativo"
+            remainingDays > 0 -> "Status do Plano - Atenção"
+            else -> "Status do Plano - Expirado"
+        }
+
+        val iconRes = when {
+            remainingDays > 7 -> android.R.drawable.ic_dialog_info
+            remainingDays > 0 -> android.R.drawable.ic_dialog_alert
+            else -> android.R.drawable.ic_dialog_alert
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setIcon(iconRes)
+            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+            .show()
+    }
+
+    private fun showLogoutDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Sair")
+            .setMessage("Deseja realmente sair da sua conta?")
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .setPositiveButton("Sair") { _, _ -> clearUserData() }
+            .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
+            .show()
+    }
+
+    private fun calculateRemainingDays(expirationDate: String): Int {
+        return try {
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val expiry = dateFormat.parse(expirationDate)
+            val today = Calendar.getInstance().time
+            if (expiry != null) {
+                val diffInMillis = expiry.time - today.time
+                TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS).toInt()
+            } else 0
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao calcular data de expiração: ${e.message}")
+            0
+        }
+    }
+
+    private fun updateAlertIcon() {
+        val expirationDate = currentPlanilhaData?.expirationDate
+        if (expirationDate.isNullOrEmpty()) {
+            alertIcon.visibility = View.GONE
+            return
+        }
+
+        // Sempre mostrar o ícone quando há data de expiração
+        alertIcon.visibility = View.VISIBLE
+        val remainingDays = calculateRemainingDays(expirationDate)
+
+        // Definir cor baseada nos dias restantes
+        val colorRes = when {
+            remainingDays > 7 -> R.color.gold_primary // Verde/Dourado para mais de 7 dias
+            remainingDays > 0 -> android.R.color.holo_orange_dark // Laranja para entre 1-7 dias
+            else -> android.R.color.holo_red_dark // Vermelho para expirado
+        }
+
+        // Aplicar a cor ao ícone
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alertIcon.setColorFilter(getColor(colorRes))
+        } else {
+            alertIcon.setColorFilter(ContextCompat.getColor(this, colorRes))
+        }
+
+        Log.d(TAG, "Ícone de alerta atualizado - Dias restantes: $remainingDays")
     }
 
     private fun loadUserData() {
@@ -94,12 +194,8 @@ class HomeScreen : ComponentActivity() {
         val token = prefs.getString("auth_token", null)
         val deviceId = prefs.getString("device_id", null)
 
-        Log.d(TAG, "Token: $token")
-        Log.d(TAG, "Device ID: $deviceId")
-
         if (token.isNullOrEmpty() || deviceId.isNullOrEmpty()) {
-            Log.e(TAG, "Token or Device ID not found or empty")
-            showNoDataMessage("Authentication error")
+            showNoDataMessage("Erro de autenticação")
             return
         }
 
@@ -108,118 +204,108 @@ class HomeScreen : ComponentActivity() {
 
         call.enqueue(object : Callback<PlanilhaResponse> {
             override fun onResponse(call: Call<PlanilhaResponse>, response: Response<PlanilhaResponse>) {
-                Log.d(TAG, "API Response Code: ${response.code()}")
-                Log.d(TAG, "API Response Message: ${response.message()}")
-
                 if (response.isSuccessful) {
                     val planilhaResponse = response.body()
                     if (planilhaResponse != null) {
                         currentPlanilhaData = planilhaResponse
                         updateUI(planilhaResponse)
+                        updateAlertIcon() // Sempre atualizar o ícone
                     } else {
-                        Log.e(TAG, "Empty response from API")
-                        showNoDataMessage("Data not available")
+                        showNoDataMessage("Dados indisponíveis")
+                        // Mesmo sem dados, tentar mostrar o ícone se houver data de expiração
+                        updateAlertIcon()
                     }
                 } else {
-                    Log.e(TAG, "Request error: ${response.code()} - ${response.message()}")
-                    try {
-                        val errorBody = response.errorBody()?.string()
-                        Log.e(TAG, "Error body: $errorBody")
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error reading error body: ${e.message}")
-                    }
-                    showNoDataMessage("Error loading data")
+                    showNoDataMessage("Erro ao carregar dados")
+                    Log.e(TAG, "Erro na resposta: ${response.code()} - ${response.message()}")
                 }
             }
 
             override fun onFailure(call: Call<PlanilhaResponse>, t: Throwable) {
-                Log.e(TAG, "Request failed: ${t.message}", t)
-                showNoDataMessage("Connection error")
+                showNoDataMessage("Erro de conexão")
+                Log.e(TAG, "Falha na requisição: ${t.message}")
             }
         })
     }
 
     private fun updateUI(planilhaResponse: PlanilhaResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            try {
-                Log.d(TAG, "=== INICIANDO UPDATE UI ===")
+            val userName = planilhaResponse.name ?: "Usuário"
+            greetingText.text = "Bem-vindo(a), $userName!"
 
-                val userName = planilhaResponse.name ?: "Usuário"
-                greetingText.text = "Bem-vindo(a), $userName!"
+            val hasTraining = hasTrainingData()
+            val hasDiet = hasDietData()
+            val hasPdf = hasPdfData()
 
-                val hasTraining = hasTrainingData()
-                val hasDiet = hasDietData()
-                val hasPdf = hasPdfData()
-
-                Log.d(TAG, "Has training data: $hasTraining")
-                Log.d(TAG, "Has diet data: $hasDiet")
-                Log.d(TAG, "Has PDF data: $hasPdf")
-
-                if (hasPdf && !hasTraining && !hasDiet) {
-                    // Caso de upload (apenas PDF)
+            when {
+                hasPdf && !hasTraining && !hasDiet -> {
                     pdfCardView.visibility = View.VISIBLE
                     trainingCardView.visibility = View.GONE
                     dietCardView.visibility = View.GONE
-                    Log.d(TAG, "Modo Upload: Apenas PDF visível")
-                } else if ((hasTraining || hasDiet) && !hasPdf) {
-                    // Caso de cadastro manual (treino ou dieta)
+                    noDataText.visibility = View.GONE
+                }
+                (hasTraining || hasDiet) && !hasPdf -> {
                     trainingCardView.visibility = if (hasTraining) View.VISIBLE else View.GONE
                     dietCardView.visibility = if (hasDiet) View.VISIBLE else View.GONE
                     pdfCardView.visibility = View.GONE
-                    Log.d(TAG, "Modo Manual: Treino e/ou Dieta visíveis")
-                } else if (hasPdf && (hasTraining || hasDiet)) {
-                    // Caso misto (priorizar PDF com aviso)
+                    noDataText.visibility = View.GONE
+                }
+                hasPdf && (hasTraining || hasDiet) -> {
                     pdfCardView.visibility = View.VISIBLE
                     trainingCardView.visibility = View.GONE
                     dietCardView.visibility = View.GONE
-                    noDataText.visibility = View.VISIBLE
                     noDataText.text = "Atenção: Dados mistos (PDF priorizado)"
-                    Log.d(TAG, "Modo Misto: PDF visível com aviso")
-                } else {
-                    // Sem dados ou erro
+                    noDataText.visibility = View.VISIBLE
+                }
+                else -> {
                     trainingCardView.visibility = View.GONE
                     dietCardView.visibility = View.GONE
                     pdfCardView.visibility = View.GONE
-                    noDataText.visibility = View.VISIBLE
                     noDataText.text = "Nenhum dado disponível"
-                    Log.d(TAG, "Sem dados: Nenhum botão visível")
+                    noDataText.visibility = View.VISIBLE
                 }
+            }
 
-                planilhaResponse.expirationDate?.let { expirationDate ->
-                    planExpiryText.text = "Data de expiração: $expirationDate"
-                    planExpiryText.visibility = View.VISIBLE
-                } ?: run { planExpiryText.visibility = View.GONE }
-
-                Log.d(TAG, "=== UI UPDATE COMPLETED ===")
-
-            } catch (e: Exception) {
-                Log.e(TAG, "Error updating UI: ${e.message}", e)
-                showNoDataMessage("Error displaying data")
+            // Sempre tentar mostrar a data de expiração se disponível
+            planilhaResponse.expirationDate?.let { expirationDate ->
+                planExpiryText.text = "Data de expiração: $expirationDate"
+                planExpiryText.parent?.let { parent ->
+                    if (parent is CardView) {
+                        parent.visibility = View.VISIBLE
+                    }
+                }
+                planExpiryText.visibility = View.VISIBLE
+                Log.d(TAG, "Data de expiração definida: $expirationDate")
+            } ?: run {
+                planExpiryText.visibility = View.GONE
+                planExpiryText.parent?.let { parent ->
+                    if (parent is CardView) {
+                        parent.visibility = View.GONE
+                    }
+                }
+                Log.d(TAG, "Nenhuma data de expiração disponível")
             }
         }
     }
 
     private fun hasTrainingData(): Boolean {
         val trainings = currentPlanilhaData?.getTrainingsSafe() ?: emptyList()
-        val hasData = trainings.isNotEmpty()
-        Log.d(TAG, "hasTrainingData: $hasData (${trainings.size} trainings)")
-        return hasData
+        return trainings.isNotEmpty()
     }
 
     private fun hasDietData(): Boolean {
         val meals = currentPlanilhaData?.getMealsSafe() ?: emptyList()
-        val hasData = meals.isNotEmpty()
-        Log.d(TAG, "hasDietData: $hasData (${meals.size} meals)")
-        return hasData
+        return meals.isNotEmpty()
     }
 
     private fun hasPdfData(): Boolean {
         val pdfs = currentPlanilhaData?.getWeeklyPdfsSafe() ?: emptyList()
         val hasValidPdf = pdfs.any { it.hasValidUrl() }
-        Log.d(TAG, "hasPdfData: $hasValidPdf, PDFs count: ${pdfs.size}")
+
         pdfs.forEachIndexed { index, pdf ->
             Log.d(TAG, "PDF $index: url=${pdf.pdfUrl}, valid=${pdf.hasValidUrl()}")
         }
+
         return hasValidPdf
     }
 
@@ -230,27 +316,18 @@ class HomeScreen : ComponentActivity() {
     }
 
     private fun openPdfViewer() {
-        try {
-            val pdfs = currentPlanilhaData?.getWeeklyPdfsSafe() ?: emptyList()
-            val validPdf = pdfs.find { it.hasValidUrl() }
+        val pdfs = currentPlanilhaData?.getWeeklyPdfsSafe() ?: emptyList()
+        val validPdf = pdfs.find { it.hasValidUrl() }
 
-            if (validPdf == null) {
-                Log.e(TAG, "No valid PDF found")
-                showNoDataMessage("PDF not available")
-                return
-            }
-
-            noDataText.visibility = View.GONE
-
-            val intent = Intent(this, PdfViewerScreen::class.java)
-            intent.putExtra("PDF_URL", validPdf.getFullUrl())
-            validPdf.weekday?.let { intent.putExtra("WEEKDAY", it) }
-            startActivity(intent)
-
-        } catch (e: Exception) {
-            Log.e(TAG, "Error opening PDF: ${e.message}", e)
-            showNoDataMessage("Error opening PDF")
+        if (validPdf == null) {
+            showNoDataMessage("PDF não disponível")
+            return
         }
+
+        val intent = Intent(this, PdfViewerScreen::class.java)
+        intent.putExtra("PDF_URL", validPdf.getFullUrl())
+        validPdf.weekday?.let { intent.putExtra("WEEKDAY", it) }
+        startActivity(intent)
     }
 
     private fun clearUserData() {
@@ -263,7 +340,6 @@ class HomeScreen : ComponentActivity() {
 
     private fun showNoDataMessage(message: String) {
         CoroutineScope(Dispatchers.Main).launch {
-            Log.d(TAG, "Showing no data message: $message")
             noDataText.text = message
             noDataText.visibility = View.VISIBLE
             Toast.makeText(this@HomeScreen, message, Toast.LENGTH_SHORT).show()
@@ -274,21 +350,22 @@ class HomeScreen : ComponentActivity() {
         super.onResume()
         if (currentPlanilhaData == null) {
             loadUserData()
+        } else {
+            // Se já tem dados, apenas atualizar o ícone
+            updateAlertIcon()
         }
     }
 }
 
-// Extensões para WeeklyPdf
+// Extensões para validar PDF
 fun WeeklyPdf.hasValidUrl(): Boolean {
     return !pdfUrl.isNullOrEmpty() && Uri.parse(getFullUrl()).isHierarchical
 }
 
 fun WeeklyPdf.getFullUrl(): String {
-    return if (pdfUrl?.startsWith("http") == true || pdfUrl?.startsWith("https") == true) {
+    return if (pdfUrl?.startsWith("http") == true) {
         pdfUrl!!
     } else {
-        "${RetrofitClient.BASE_URL}${pdfUrl ?: ""}".also {
-            Log.d("WeeklyPdf", "Construída URL: $it")
-        }
+        "${RetrofitClient.BASE_URL}${pdfUrl ?: ""}"
     }
 }
