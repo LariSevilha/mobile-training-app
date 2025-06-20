@@ -3,11 +3,14 @@
     <!-- Primary brand colors -->
     <color name="gold_primary">#CEAC5E</color>
     <color name="gold_light">#E6C47E</color>
+    <color name="gold_dark">#B8954A</color>
     <color name="gold_transparent">#33CEAC5E</color>
 
     <!-- Background colors -->
     <color name="background_black">#000000</color>
+    <color name="background_dark">#0A0A0A</color>
     <color name="card_background">#1A1A1A</color>
+    <color name="card_background_elevated">#252525</color>
     <color name="day_tag_background">#1A1A1A</color>
 
     <!-- Button colors -->
@@ -17,35 +20,43 @@
     <!-- Text colors -->
     <color name="text_primary">#FFFFFF</color>
     <color name="text_secondary">#94A3B8</color>
+    <color name="text_tertiary">#64748B</color>
     <color name="text_white">#FFFFFF</color>
 
     <!-- Status colors -->
     <color name="error_red">#EF4444</color>
     <color name="success_green">#10B981</color>
+    <color name="success_green_light">#34D399</color>
     <color name="warning_yellow">#F59E0B</color>
+    <color name="info_blue">#3B82F6</color>
+
     <!-- Input colors -->
     <color name="input_background">#2A2A2A</color>
     <color name="input_border">#3A3A3A</color>
     <color name="input_bg">#1E1E1E</color>
+
     <!-- Divider colors -->
     <color name="divider">#2A2A2A</color>
+    <color name="divider_light">#3A3A3A</color>
 
+    <!-- Gradient colors -->
+    <color name="gradient_start">#000000</color>
+    <color name="gradient_center">#1A1A1A</color>
+    <color name="gradient_end">#0A0A0A</color>
 
-    <style name="GoldButtonStyle" parent="Widget.Material3.Button">
-        <item name="android:background">@color/gold_primary</item>
-        <item name="android:textColor">@color/button_black</item>
-    </style>
+    <!-- Icon background colors -->
+    <color name="icon_bg_training_start">#CEAC5E</color>
+    <color name="icon_bg_training_end">#E6C47E</color>
+    <color name="icon_bg_diet_start">#10B981</color>
+    <color name="icon_bg_diet_end">#34D399</color>
+    <color name="icon_bg_pdf_start">#EF4444</color>
+    <color name="icon_bg_pdf_end">#F87171</color>
 
-    <style name="DayButtonStyle" parent="Widget.Material3.Button">
-        <item name="android:background">@color/input_bg</item>
-        <item name="android:textColor">@color/text_primary</item>
-        <item name="android:layout_margin">4dp</item>
-    </style>
+    <!-- Ripple effects -->
+    <color name="ripple_gold">#44CEAC5E</color>
+    <color name="ripple_white">#22FFFFFF</color>
 
-    <style name="DayButtonText" parent="TextAppearance.Material3.BodyLarge">
-        <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
+    <!-- Shadow colors -->
+    <color name="shadow_light">#11FFFFFF</color>
+    <color name="shadow_dark">#22000000</color>
 </resources>

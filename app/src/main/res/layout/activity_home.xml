@@ -1,127 +1,347 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background_black">
+    android:background="@drawable/gradient_background"
+    android:fillViewport="true">
 
-    <!-- Header com saudação e expiração -->
-    <TextView
-        android:id="@+id/greeting_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Bem-vindo(a), Usuário!"
-        android:textColor="@color/gold_primary"
-        android:textSize="24sp"
-        android:padding="16dp" />
-
-    <TextView
-        android:id="@+id/plan_expiry_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Data de expiração: DD/MM/AAAA"
-        android:textColor="@color/gold_primary"
-        android:textSize="14sp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:visibility="gone" />
-
-    <!-- Botões de ação -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingBottom="32dp">
 
+        <!-- Header Section -->
         <LinearLayout
-            android:id="@+id/training_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:orientation="horizontal"
-            android:padding="12dp"
-            android:visibility="gone">
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:layout_marginTop="24dp">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/treino_icon"
-                app:tint="@color/gold_primary" />
-
+            <!-- Welcome Text -->
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/greeting_text"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:text="Treino"
-                android:textColor="@color/gold_primary"
-                android:textSize="18sp" />
+                android:text="Olá, Usuário!"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.02"
+                android:layout_marginBottom="16px" />
+
+            <!-- Subtitle -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pronto para treinar hoje?"
+                android:textColor="@color/text_secondary"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp"
+                android:fontFamily="sans-serif-light" />
+
+            <!-- Plan Expiry Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@color/gold_transparent"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/plan_expiry_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Data de expiração: DD/MM/AAAA"
+                    android:textColor="@color/gold_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:padding="12dp"
+                    android:drawableStart="@drawable/ic_calendar"
+                    android:drawablePadding="8dp"
+                    android:gravity="center_vertical" />
+            </androidx.cardview.widget.CardView>
+
         </LinearLayout>
 
+        <!-- Action Cards Section -->
         <LinearLayout
-            android:id="@+id/diet_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:orientation="horizontal"
-            android:padding="12dp"
-            android:visibility="gone">
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/alimentacao_icon"
-                app:tint="@color/gold_primary" />
-
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- Training Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/training_card"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:text="Dieta"
-                android:textColor="@color/gold_primary"
-                android:textSize="18sp" />
+                android:layout_marginBottom="12dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:transitionName="training_transition"
+                app:cardBackgroundColor="@color/card_background"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="8dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/training_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:orientation="horizontal"
+                    android:padding="20dp">
+
+                    <!-- Icon Container -->
+                    <FrameLayout
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:background="@drawable/icon_background_training">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/treino_icon"
+                            app:tint="@color/text_primary" />
+                    </FrameLayout>
+
+                    <!-- Content -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Treino"
+                            android:textColor="@color/text_primary"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:fontFamily="sans-serif-medium" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Acesse seus exercícios"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="14sp"
+                            android:layout_marginTop="4dp" />
+                    </LinearLayout>
+
+                    <!-- Arrow -->
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:src="@drawable/ic_arrow_right"
+                        app:tint="@color/gold_primary" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Diet Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/diet_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/card_background"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/diet_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:orientation="horizontal"
+                    android:padding="20dp">
+
+                    <!-- Icon Container -->
+                    <FrameLayout
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:background="@drawable/icon_background_diet">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/alimentacao_icon"
+                            app:tint="@color/text_primary" />
+                    </FrameLayout>
+
+                    <!-- Content -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Dieta"
+                            android:textColor="@color/text_primary"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:fontFamily="sans-serif-medium" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Veja seu plano alimentar"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="14sp"
+                            android:layout_marginTop="4dp" />
+                    </LinearLayout>
+
+                    <!-- Arrow -->
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:src="@drawable/ic_arrow_right"
+                        app:tint="@color/gold_primary" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- PDF Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/pdf_card_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/card_background"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/pdf_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:orientation="horizontal"
+                    android:padding="20dp">
+
+                    <!-- Icon Container -->
+                    <FrameLayout
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:background="@drawable/icon_background_pdf">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_pdf"
+                            app:tint="@color/text_primary" />
+                    </FrameLayout>
+
+                    <!-- Content -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="PDF"
+                            android:textColor="@color/text_primary"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:fontFamily="sans-serif-medium" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Visualizar treino e dieta da semana"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="14sp"
+                            android:layout_marginTop="4dp" />
+                    </LinearLayout>
+
+                    <!-- Arrow -->
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:src="@drawable/ic_arrow_right"
+                        app:tint="@color/gold_primary" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
         </LinearLayout>
 
+        <!-- No Data Section -->
         <LinearLayout
-            android:id="@+id/pdf_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:orientation="horizontal"
-            android:padding="12dp"
-            android:visibility="gone">
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp"
+            android:layout_marginTop="32dp">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_pdf"
-                app:tint="@color/gold_primary" />
+
 
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/no_data_text"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:text="PDF"
-                android:textColor="@color/gold_primary"
-                android:textSize="18sp" />
+                android:text="Nenhum dado disponível"
+                android:textColor="@color/text_secondary"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:layout_marginTop="16dp"
+                android:fontFamily="sans-serif-light"
+                android:visibility="gone" />
+
         </LinearLayout>
+
+        <!-- Motivational Quote Section -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/gold_transparent"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="💪 Sua dedicação de hoje é o resultado de amanhã!"
+                android:textColor="@color/gold_primary"
+                android:textSize="14sp"
+                android:textStyle="italic"
+                android:padding="16dp"
+                android:gravity="center"
+                android:fontFamily="sans-serif-light" />
+        </androidx.cardview.widget.CardView>
+
     </LinearLayout>
-
-    <!-- Mensagem de ausência de dados -->
-    <TextView
-        android:id="@+id/no_data_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Nenhum dado disponível"
-        android:textColor="@color/gold_primary"
-        android:textSize="16sp"
-        android:gravity="center"
-        android:padding="16dp"
-        android:visibility="gone" />
-</LinearLayout>
+</ScrollView>

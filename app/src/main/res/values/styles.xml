@@ -1,10 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-
-    <!-- Custom component styles -->
-    <style name="CustomButton" parent="Widget.AppCompat.Button">
-        <item name="android:background">@color/gold_primary</item>
+<resources>
+    <!-- Button Styles -->
+    <style name="GoldButtonStyle" parent="Widget.Material3.Button">
+        <item name="android:background">@drawable/gold_button_background</item>
         <item name="android:textColor">@color/button_black</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:elevation">8dp</item>
+        <item name="android:stateListAnimator">@null</item>
     </style>
 
+    <style name="DayButtonStyle" parent="Widget.Material3.Button">
+        <item name="android:background">@drawable/day_button_background</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:elevation">4dp</item>
+    </style>
+
+    <!-- Text Styles -->
+    <style name="HeaderTextStyle">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+
+    <style name="SubHeaderTextStyle">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="CardTitleTextStyle">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="CardSubtitleTextStyle">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="DayButtonText" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Card Styles -->
+    <style name="ModernCardStyle">
+        <item name="cardBackgroundColor">@color/card_background</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">8dp</item>
+        <item name="cardUseCompatPadding">true</item>
+    </style>
+
+    <style name="ElevatedCardStyle" parent="ModernCardStyle">
+        <item name="cardBackgroundColor">@color/card_background_elevated</item>
+        <item name="cardElevation">12dp</item>
+    </style>
+
+    <!-- Icon Container Styles -->
+    <style name="IconContainerStyle">
+        <item name="android:layout_width">56dp</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:elevation">2dp</item>
+    </style>
+
+    <!-- Ripple Effect Styles -->
+    <style name="RippleEffectLight">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+    </style>
+
+    <style name="RippleEffectRounded">
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+        <item name="android:foreground">?android:attr/selectableItemBackgroundBorderless</item>
+    </style>
+
+    <!-- Input Styles -->
+    <style name="ModernInputStyle" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="android:textColorHint">@color/text_secondary</item>
+        <item name="boxStrokeColor">@color/gold_primary</item>
+        <item name="boxStrokeWidth">2dp</item>
+        <item name="hintTextColor">@color/gold_primary</item>
+    </style>
+
+    <!-- Progress Bar Styles -->
+    <style name="GoldProgressBar" parent="Widget.Material3.LinearProgressIndicator">
+        <item name="indicatorColor">@color/gold_primary</item>
+        <item name="trackColor">@color/input_background</item>
+        <item name="trackThickness">8dp</item>
+        <item name="trackCornerRadius">4dp</item>
+    </style>
+
+    <!-- Floating Action Button Style -->
+    <style name="GoldFABStyle" parent="Widget.Material3.FloatingActionButton.Primary">
+        <item name="backgroundTint">@color/gold_primary</item>
+        <item name="tint">@color/button_black</item>
+        <item name="elevation">16dp</item>
+        <item name="pressedTranslationZ">20dp</item>
+    </style>
 </resources>

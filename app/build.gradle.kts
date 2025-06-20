@@ -63,10 +63,9 @@ dependencies {
     implementation(libs.firebase.messaging)
     implementation(libs.androidx.navigation.compose)
     implementation("com.google.android.material:material:1.11.0")
+    implementation("com.google.android.material:material:1.11.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
 
-    // REMOVIDO: Biblioteca AndroidPdfViewer que não funciona mais
-    // implementation(libs.android.pdf.viewer)
-    // implementation("com.github.barteksc:android-pdf-viewer:3.2.0-beta.1")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base Application Theme -->
+
     <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/gold_primary</item>
         <item name="colorPrimaryVariant">@color/gold_dark</item>
@@ -17,10 +17,5 @@
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
         <item name="android:windowContentTransitions">true</item>
-    </style>
-
-    <!-- Night Theme Variant -->
-    <style name="AppTheme.Dark" parent="AppTheme">
-        <!-- Dark theme specific overrides can go here -->
     </style>
 </resources>

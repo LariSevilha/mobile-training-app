@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.cardview.widget.CardView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,6 +26,11 @@ class HomeScreen : ComponentActivity() {
     private lateinit var pdfCard: LinearLayout
     private lateinit var noDataText: TextView
     private lateinit var planExpiryText: TextView
+
+    // CardViews para controlar visibilidade
+    private lateinit var trainingCardView: CardView
+    private lateinit var dietCardView: CardView
+    private lateinit var pdfCardView: CardView
 
     private var currentPlanilhaData: PlanilhaResponse? = null
 
@@ -49,6 +55,12 @@ class HomeScreen : ComponentActivity() {
             pdfCard = findViewById(R.id.pdf_card)
             noDataText = findViewById(R.id.no_data_text)
             planExpiryText = findViewById(R.id.plan_expiry_text)
+
+            // CardViews
+            trainingCardView = findViewById(R.id.training_card)
+            dietCardView = findViewById(R.id.diet_card)
+            pdfCardView = findViewById(R.id.pdf_card_container)
+
         } catch (e: Exception) {
             Log.e(TAG, "Error initializing views: ${e.message}", e)
             throw e
@@ -145,29 +157,29 @@ class HomeScreen : ComponentActivity() {
 
                 if (hasPdf && !hasTraining && !hasDiet) {
                     // Caso de upload (apenas PDF)
-                    pdfCard.visibility = View.VISIBLE
-                    trainingButton.visibility = View.GONE
-                    dietButton.visibility = View.GONE
+                    pdfCardView.visibility = View.VISIBLE
+                    trainingCardView.visibility = View.GONE
+                    dietCardView.visibility = View.GONE
                     Log.d(TAG, "Modo Upload: Apenas PDF visível")
                 } else if ((hasTraining || hasDiet) && !hasPdf) {
                     // Caso de cadastro manual (treino ou dieta)
-                    trainingButton.visibility = if (hasTraining) View.VISIBLE else View.GONE
-                    dietButton.visibility = if (hasDiet) View.VISIBLE else View.GONE
-                    pdfCard.visibility = View.GONE
+                    trainingCardView.visibility = if (hasTraining) View.VISIBLE else View.GONE
+                    dietCardView.visibility = if (hasDiet) View.VISIBLE else View.GONE
+                    pdfCardView.visibility = View.GONE
                     Log.d(TAG, "Modo Manual: Treino e/ou Dieta visíveis")
                 } else if (hasPdf && (hasTraining || hasDiet)) {
                     // Caso misto (priorizar PDF com aviso)
-                    pdfCard.visibility = View.VISIBLE
-                    trainingButton.visibility = View.GONE
-                    dietButton.visibility = View.GONE
+                    pdfCardView.visibility = View.VISIBLE
+                    trainingCardView.visibility = View.GONE
+                    dietCardView.visibility = View.GONE
                     noDataText.visibility = View.VISIBLE
                     noDataText.text = "Atenção: Dados mistos (PDF priorizado)"
                     Log.d(TAG, "Modo Misto: PDF visível com aviso")
                 } else {
                     // Sem dados ou erro
-                    trainingButton.visibility = View.GONE
-                    dietButton.visibility = View.GONE
-                    pdfCard.visibility = View.GONE
+                    trainingCardView.visibility = View.GONE
+                    dietCardView.visibility = View.GONE
+                    pdfCardView.visibility = View.GONE
                     noDataText.visibility = View.VISIBLE
                     noDataText.text = "Nenhum dado disponível"
                     Log.d(TAG, "Sem dados: Nenhum botão visível")
