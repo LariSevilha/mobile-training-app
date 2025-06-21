@@ -26,6 +26,11 @@
             android:textSize="22sp"
             android:fontFamily="sans-serif-medium"
             android:textStyle="bold" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
     </LinearLayout>
 
     <ScrollView
@@ -42,10 +47,15 @@
 
             <LinearLayout
                 android:id="@+id/monday_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 style="@style/DayButtonStyle"
                 android:layout_marginBottom="16dp">
                 <TextView
                     style="@style/DayButtonText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Segunda-feira" />
                 <TextView
                     android:layout_width="wrap_content"
@@ -60,10 +70,15 @@
 
             <LinearLayout
                 android:id="@+id/tuesday_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 style="@style/DayButtonStyle"
                 android:layout_marginBottom="16dp">
                 <TextView
                     style="@style/DayButtonText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Terça-feira" />
                 <TextView
                     android:layout_width="wrap_content"
@@ -78,10 +93,15 @@
 
             <LinearLayout
                 android:id="@+id/wednesday_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 style="@style/DayButtonStyle"
                 android:layout_marginBottom="16dp">
                 <TextView
                     style="@style/DayButtonText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Quarta-feira" />
                 <TextView
                     android:layout_width="wrap_content"
@@ -96,10 +116,15 @@
 
             <LinearLayout
                 android:id="@+id/thursday_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 style="@style/DayButtonStyle"
                 android:layout_marginBottom="16dp">
                 <TextView
                     style="@style/DayButtonText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Quinta-feira" />
                 <TextView
                     android:layout_width="wrap_content"
@@ -114,10 +139,15 @@
 
             <LinearLayout
                 android:id="@+id/friday_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 style="@style/DayButtonStyle"
                 android:layout_marginBottom="16dp">
                 <TextView
                     style="@style/DayButtonText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Sexta-feira" />
                 <TextView
                     android:layout_width="wrap_content"
@@ -132,10 +162,15 @@
 
             <LinearLayout
                 android:id="@+id/saturday_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 style="@style/DayButtonStyle"
                 android:layout_marginBottom="16dp">
                 <TextView
                     style="@style/DayButtonText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Sábado" />
                 <TextView
                     android:layout_width="wrap_content"
@@ -150,10 +185,15 @@
 
             <LinearLayout
                 android:id="@+id/sunday_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 style="@style/DayButtonStyle"
                 android:layout_marginBottom="24dp">
                 <TextView
                     style="@style/DayButtonText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Domingo" />
                 <TextView
                     android:layout_width="wrap_content"
@@ -168,6 +208,8 @@
 
             <LinearLayout
                 android:id="@+id/back_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 style="@style/GoldButtonStyle">
                 <TextView
                     android:layout_width="wrap_content"

@@ -14,13 +14,12 @@
         <item name="colorOnSurface">@color/text_primary</item>
         <item name="android:statusBarColor">@color/background_black</item>
         <item name="android:navigationBarColor">@color/background_black</item>
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
         <item name="android:windowContentTransitions">true</item>
     </style>
 
     <!-- Night Theme Variant -->
     <style name="AppTheme.Dark" parent="AppTheme">
-        <!-- Dark theme specific overrides can go here -->
+        <item name="android:colorBackground">@color/background_dark</item>
+        <item name="colorSurface">@color/card_background_elevated</item>
     </style>
 </resources>

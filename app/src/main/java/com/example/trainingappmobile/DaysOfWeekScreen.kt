@@ -6,8 +6,9 @@ import android.util.Log
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 
-class DaysOfWeekScreen : ComponentActivity() {
+class DaysOfWeekScreen : AppCompatActivity() {
 
     companion object {
         private const val TAG = "DaysOfWeekScreen"

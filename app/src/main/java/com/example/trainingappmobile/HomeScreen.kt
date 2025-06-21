@@ -11,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
@@ -23,7 +24,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class HomeScreen : ComponentActivity() {
+class HomeScreen : AppCompatActivity() {
 
     private lateinit var greetingText: TextView
     private lateinit var trainingButton: LinearLayout
@@ -307,12 +308,12 @@ class HomeScreen : ComponentActivity() {
 
     private fun openDaysOfWeekScreen(type: String) {
         try {
-            Log.d(TAG, "Abrindo PlanilhaScreen com tipo: $type")
-            val intent = Intent(this, PlanilhaScreen::class.java)
-            intent.putExtra("DATA_TYPE", type)
+            Log.d(TAG, "Abrindo DaysOfWeekScreen com tipo: $type")
+            val intent = Intent(this, DaysOfWeekScreen::class.java)
+            intent.putExtra("SCREEN_TYPE", type)
             startActivity(intent)
         } catch (e: Exception) {
-            Log.e(TAG, "Erro ao abrir PlanilhaScreen: ${e.message}", e)
+            Log.e(TAG, "Erro ao abrir DaysOfWeekScreen: ${e.message}", e)
             Toast.makeText(this, "Erro ao abrir tela: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
