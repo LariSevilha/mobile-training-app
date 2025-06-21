@@ -10,7 +10,7 @@
         android:id="@+id/planilha_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Carregando planilha..."
+        android:text="@string/planilha_title"
         android:textColor="@color/text_primary"
         android:textSize="18sp"
         android:fontFamily="sans-serif-medium"
@@ -24,19 +24,26 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:padding="8dp"
-        android:background="@color/input_bg" />
+        android:background="@color/input_bg"
+        android:contentDescription="@string/planilha_lista_descricao" />
 
     <Button
         android:id="@+id/back_button"
         style="@style/GoldButtonStyle"
-        android:text="Voltar"
-        android:textColor="@color/button_black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"
+        android:text="@string/back_button"
+        android:textColor="@color/button_black" />
 
     <Button
         android:id="@+id/logout_button"
         style="@style/GoldButtonStyle"
-        android:text="Sair"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/logout_button"
         android:textColor="@color/button_black" />
 </LinearLayout>

@@ -13,7 +13,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:networkSecurityConfig="@xml/network_security_config">
+        android:networkSecurityConfig="@xml/network_security_config" >
+
+
 
         <activity
             android:name=".MainActivity"
@@ -25,6 +27,9 @@
         </activity>
         <activity android:name=".HomeScreen" />
         <activity android:name=".PdfViewerScreen" />
+        <activity android:name=".PlanilhaScreen" />
         <activity android:name=".DaysOfWeekScreen" />
+        <activity android:name=".DayDetailsScreen" />
+
     </application>
 </manifest>

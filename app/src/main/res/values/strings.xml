@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">TrainingAppMobile</string>
+    <string name="planilha_title">Carregando planilha...</string>
+    <string name="back_button">Voltar</string>
+    <string name="logout_button">Sair</string>
+    <string name="planilha_lista_descricao">Lista de exercícios da planilha</string>
+
 </resources>

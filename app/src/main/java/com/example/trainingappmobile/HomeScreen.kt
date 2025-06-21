@@ -1,27 +1,24 @@
 package com.example.trainingappmobile
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import android.widget.ImageView
 import androidx.activity.ComponentActivity
-import androidx.cardview.widget.CardView
 import androidx.appcompat.app.AlertDialog
+import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import android.view.View
-import android.net.Uri
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
-import com.google.gson.Gson
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -73,22 +70,25 @@ class HomeScreen : ComponentActivity() {
 
     private fun setupClickListeners() {
         trainingButton.setOnClickListener {
+            Log.d(TAG, "Botão de treino clicado")
             if (hasTrainingData()) {
-                openDaysOfWeekScreen("training")
+                openDaysOfWeekScreen("TRAINING")
             } else {
                 showNoDataMessage("Nenhum treino disponível")
             }
         }
 
         dietButton.setOnClickListener {
+            Log.d(TAG, "Botão de dieta clicado")
             if (hasDietData()) {
-                openDaysOfWeekScreen("diet")
+                openDaysOfWeekScreen("DIET")
             } else {
                 showNoDataMessage("Nenhuma dieta disponível")
             }
         }
 
         pdfCard.setOnClickListener {
+            Log.d(TAG, "Botão de PDF clicado")
             openPdfViewer()
         }
 
@@ -168,24 +168,16 @@ class HomeScreen : ComponentActivity() {
             return
         }
 
-        // Sempre mostrar o ícone quando há data de expiração
         alertIcon.visibility = View.VISIBLE
         val remainingDays = calculateRemainingDays(expirationDate)
 
-        // Definir cor baseada nos dias restantes
         val colorRes = when {
-            remainingDays > 7 -> R.color.gold_primary // Verde/Dourado para mais de 7 dias
-            remainingDays > 0 -> android.R.color.holo_orange_dark // Laranja para entre 1-7 dias
-            else -> android.R.color.holo_red_dark // Vermelho para expirado
+            remainingDays > 7 -> R.color.gold_primary
+            remainingDays > 0 -> android.R.color.holo_orange_dark
+            else -> android.R.color.holo_red_dark
         }
 
-        // Aplicar a cor ao ícone
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alertIcon.setColorFilter(getColor(colorRes))
-        } else {
-            alertIcon.setColorFilter(ContextCompat.getColor(this, colorRes))
-        }
-
+        alertIcon.setColorFilter(ContextCompat.getColor(this, colorRes))
         Log.d(TAG, "Ícone de alerta atualizado - Dias restantes: $remainingDays")
     }
 
@@ -193,6 +185,8 @@ class HomeScreen : ComponentActivity() {
         val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
         val token = prefs.getString("auth_token", null)
         val deviceId = prefs.getString("device_id", null)
+
+        Log.d(TAG, "Token: $token, DeviceId: $deviceId")
 
         if (token.isNullOrEmpty() || deviceId.isNullOrEmpty()) {
             showNoDataMessage("Erro de autenticação")
@@ -204,15 +198,16 @@ class HomeScreen : ComponentActivity() {
 
         call.enqueue(object : Callback<PlanilhaResponse> {
             override fun onResponse(call: Call<PlanilhaResponse>, response: Response<PlanilhaResponse>) {
+                Log.d(TAG, "Resposta da API: ${response.code()} - ${response.message()}")
                 if (response.isSuccessful) {
                     val planilhaResponse = response.body()
+                    Log.d(TAG, "Dados recebidos: $planilhaResponse")
                     if (planilhaResponse != null) {
                         currentPlanilhaData = planilhaResponse
                         updateUI(planilhaResponse)
-                        updateAlertIcon() // Sempre atualizar o ícone
+                        updateAlertIcon()
                     } else {
                         showNoDataMessage("Dados indisponíveis")
-                        // Mesmo sem dados, tentar mostrar o ícone se houver data de expiração
                         updateAlertIcon()
                     }
                 } else {
@@ -266,7 +261,6 @@ class HomeScreen : ComponentActivity() {
                 }
             }
 
-            // Sempre tentar mostrar a data de expiração se disponível
             planilhaResponse.expirationDate?.let { expirationDate ->
                 planExpiryText.text = "Data de expiração: $expirationDate"
                 planExpiryText.parent?.let { parent ->
@@ -290,11 +284,13 @@ class HomeScreen : ComponentActivity() {
 
     private fun hasTrainingData(): Boolean {
         val trainings = currentPlanilhaData?.getTrainingsSafe() ?: emptyList()
+        Log.d(TAG, "hasTrainingData: ${trainings.size} treinos encontrados")
         return trainings.isNotEmpty()
     }
 
     private fun hasDietData(): Boolean {
         val meals = currentPlanilhaData?.getMealsSafe() ?: emptyList()
+        Log.d(TAG, "hasDietData: ${meals.size} refeições encontradas")
         return meals.isNotEmpty()
     }
 
@@ -310,9 +306,15 @@ class HomeScreen : ComponentActivity() {
     }
 
     private fun openDaysOfWeekScreen(type: String) {
-        val intent = Intent(this, DaysOfWeekScreen::class.java)
-        intent.putExtra("SCREEN_TYPE", type)
-        startActivity(intent)
+        try {
+            Log.d(TAG, "Abrindo PlanilhaScreen com tipo: $type")
+            val intent = Intent(this, PlanilhaScreen::class.java)
+            intent.putExtra("DATA_TYPE", type)
+            startActivity(intent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao abrir PlanilhaScreen: ${e.message}", e)
+            Toast.makeText(this, "Erro ao abrir tela: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun openPdfViewer() {
@@ -324,10 +326,15 @@ class HomeScreen : ComponentActivity() {
             return
         }
 
-        val intent = Intent(this, PdfViewerScreen::class.java)
-        intent.putExtra("PDF_URL", validPdf.getFullUrl())
-        validPdf.weekday?.let { intent.putExtra("WEEKDAY", it) }
-        startActivity(intent)
+        try {
+            val intent = Intent(this, PdfViewerScreen::class.java)
+            intent.putExtra("PDF_URL", validPdf.getFullUrl())
+            validPdf.weekday?.let { intent.putExtra("WEEKDAY", it) }
+            startActivity(intent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao abrir PDF: ${e.message}")
+            Toast.makeText(this, "Erro ao abrir PDF", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun clearUserData() {
@@ -351,7 +358,6 @@ class HomeScreen : ComponentActivity() {
         if (currentPlanilhaData == null) {
             loadUserData()
         } else {
-            // Se já tem dados, apenas atualizar o ícone
             updateAlertIcon()
         }
     }

@@ -63,7 +63,6 @@ dependencies {
     implementation(libs.firebase.messaging)
     implementation(libs.androidx.navigation.compose)
     implementation("com.google.android.material:material:1.11.0")
-    implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
 
 
