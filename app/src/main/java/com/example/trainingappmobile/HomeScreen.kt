@@ -11,7 +11,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +23,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class HomeScreen : AppCompatActivity() {
+class HomeScreen : ComponentActivity() {
 
     private lateinit var greetingText: TextView
     private lateinit var trainingButton: LinearLayout
@@ -307,10 +306,13 @@ class HomeScreen : AppCompatActivity() {
     }
 
     private fun openDaysOfWeekScreen(type: String) {
+        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        val token = prefs.getString("auth_token", null)
+        val deviceId = prefs.getString("device_id", null)
+        Log.d(TAG, "Antes de navegar para DaysOfWeekScreen - auth_token: $token, deviceId: $deviceId")
         try {
-            Log.d(TAG, "Abrindo DaysOfWeekScreen com tipo: $type")
             val intent = Intent(this, DaysOfWeekScreen::class.java)
-            intent.putExtra("SCREEN_TYPE", type)
+            intent.putExtra("DATA_TYPE", type) // Corrigido de SCREEN_TYPE para DATA_TYPE
             startActivity(intent)
         } catch (e: Exception) {
             Log.e(TAG, "Erro ao abrir DaysOfWeekScreen: ${e.message}", e)
@@ -364,7 +366,6 @@ class HomeScreen : AppCompatActivity() {
     }
 }
 
-// Extensões para validar PDF
 fun WeeklyPdf.hasValidUrl(): Boolean {
     return !pdfUrl.isNullOrEmpty() && Uri.parse(getFullUrl()).isHierarchical
 }

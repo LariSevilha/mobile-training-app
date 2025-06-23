@@ -10,8 +10,8 @@ class PlanilhaAdapter(private val items: List<PlanilhaItem>) :
     RecyclerView.Adapter<PlanilhaAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val titleTextView: TextView = view.findViewById(R.id.item_title)
-        val detailsTextView: TextView = view.findViewById(R.id.item_details)
+        val titleTextView: TextView = view.findViewById(R.id.tips_text)
+        val detailsTextView: TextView = view.findViewById(R.id.details_text)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

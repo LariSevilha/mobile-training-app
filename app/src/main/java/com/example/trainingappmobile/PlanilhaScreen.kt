@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -20,224 +19,136 @@ class PlanilhaScreen : ComponentActivity() {
     private lateinit var planilhaRecyclerView: RecyclerView
     private lateinit var adapter: PlanilhaAdapter
 
-    companion object {
-        private const val TAG = "PlanilhaScreen"
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_planilha)
 
-        initializeViews()
-        setupClickListeners()
-
-        val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        val apiKey = sharedPrefs.getString("auth_token", null)
-        val deviceId = sharedPrefs.getString("device_id", null)
-        Log.d(TAG, "Credenciais: apiKey=$apiKey, deviceId=$deviceId")
-
-        if (apiKey == null || deviceId == null) {
-            handleMissingCredentials()
-            return
-        }
-
-        val dataType = intent.getStringExtra("DATA_TYPE") ?: "ALL"
-        Log.d(TAG, "Tipo de dados: $dataType")
-        loadPlanilha(apiKey, deviceId, dataType)
-    }
-
-    private fun initializeViews() {
         planilhaTitle = findViewById(R.id.planilha_title)
         planilhaRecyclerView = findViewById(R.id.planilha_recycler_view)
         planilhaRecyclerView.layoutManager = LinearLayoutManager(this)
         adapter = PlanilhaAdapter(emptyList())
         planilhaRecyclerView.adapter = adapter
-    }
 
-    private fun setupClickListeners() {
+        // Configurar o botão de logout
         findViewById<Button>(R.id.logout_button)?.setOnClickListener {
-            Log.d(TAG, "Botão de logout clicado")
-            performLogout()
+            Log.d("PlanilhaScreen", "Botão de logout clicado")
+            // performLogout()
         }
 
+        // Configurar o botão de voltar
         findViewById<Button>(R.id.back_button)?.setOnClickListener {
-            Log.d(TAG, "Botão Voltar clicado")
+            Log.d("PlanilhaScreen", "Botão Voltar clicado")
             finish()
         }
-    }
 
-    private fun handleMissingCredentials() {
-        Log.e(TAG, "apiKey ou deviceId está nulo")
-        Toast.makeText(this, "Por favor, faça login novamente", Toast.LENGTH_SHORT).show()
         val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        sharedPrefs.edit().clear().apply()
-        startActivity(Intent(this, MainActivity::class.java))
-        finish()
+        val apiKey = sharedPrefs.getString("auth_token", null)
+        val deviceId = sharedPrefs.getString("device_id", null)
+        Log.d("PlanilhaScreen", "Credenciais: auth_token=$apiKey, deviceId=$deviceId")
+
+        if (apiKey == null || deviceId == null) {
+            Log.e("PlanilhaScreen", "auth_token ou deviceId está nulo")
+            Toast.makeText(this, "Por favor, faça login novamente", Toast.LENGTH_SHORT).show()
+            sharedPrefs.edit().clear().apply()
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+            return
+        }
+
+        // Obter o tipo de dados (TRAINING ou DIET)
+        val dataType = intent.getStringExtra("DATA_TYPE") ?: "ALL"
+        Log.d("PlanilhaScreen", "Tipo de dados: $dataType")
+        loadPlanilha(apiKey, deviceId, dataType)
     }
 
     private fun loadPlanilha(apiKey: String, deviceId: String, dataType: String) {
         val authHeader = "Bearer $apiKey"
-        Log.d(TAG, "Carregando planilha com authHeader=$authHeader, deviceId=$deviceId")
-
+        Log.d("PlanilhaScreen", "Carregando planilha com authHeader=$authHeader, deviceId=$deviceId")
         RetrofitClient.apiService.getPlanilha(authHeader, deviceId).enqueue(object : Callback<PlanilhaResponse> {
             override fun onResponse(call: Call<PlanilhaResponse>, response: Response<PlanilhaResponse>) {
-                Log.d(TAG, "Resposta recebida: ${response.code()}")
-
+                Log.d("PlanilhaScreen", "Resposta recebida: ${response.code()} - ${response.raw()}")
+                Log.d("PlanilhaScreen", "Corpo da resposta: ${response.body()}")
                 if (response.isSuccessful && response.body() != null) {
-                    handleSuccessfulResponse(response.body()!!, dataType)
+                    val planilha = response.body()!!
+                    Log.d("PlanilhaScreen", "Dados da planilha: $planilha")
+                    if (planilha.error == null) {
+                        planilhaTitle.text = when (dataType) {
+                            "TRAINING" -> "Treinos de ${planilha.name ?: "Usuário"}"
+                            "DIET" -> "Dieta de ${planilha.name ?: "Usuário"}"
+                            else -> "Planilha de ${planilha.name ?: "Usuário"}"
+                        }
+
+                        val items = mutableListOf<PlanilhaItem>()
+                        if (dataType == "TRAINING" || dataType == "ALL") {
+                            if (!planilha.trainings.isNullOrEmpty()) {
+                                planilha.trainings.forEach { training ->
+                                    val details = StringBuilder()
+                                    details.append("${training.getSeriesRepetitionsText()} séries x ${training.getSeriesRepetitionsText()} repetições")
+                                    if (!training.video.isNullOrEmpty()) {
+                                        details.append(" (Vídeo: ${training.video})")
+                                    }
+                                    items.add(PlanilhaItem(
+                                        title = training.exerciseName.toString(),
+                                        details = details.toString(),
+                                        type = "training"
+                                    ))
+                                }
+                            } else {
+                                items.add(PlanilhaItem(
+                                    title = "Treinos",
+                                    details = "Nenhum treino cadastrado.",
+                                    type = "training"
+                                ))
+                            }
+                        }
+                        if (dataType == "DIET" || dataType == "ALL") {
+                            if (!planilha.meals.isNullOrEmpty()) {
+                                planilha.meals.forEach { meal ->
+                                    val details = if (!meal.comidas.isNullOrEmpty()) {
+                                        meal.comidas.joinToString(", ") { comida ->
+                                            "${comida.name} (${comida.amount})"
+                                        }
+                                    } else {
+                                        "Nenhuma comida cadastrada."
+                                    }
+                                    items.add(PlanilhaItem(
+                                        title = meal.mealType.toString(),
+                                        details = details,
+                                        type = "meal"
+                                    ))
+                                }
+                            } else {
+                                items.add(PlanilhaItem(
+                                    title = "Refeições",
+                                    details = "Nenhuma refeição cadastrada.",
+                                    type = "meal"
+                                ))
+                            }
+                        }
+
+                        adapter = PlanilhaAdapter(items)
+                        planilhaRecyclerView.adapter = adapter
+                        Log.d("PlanilhaScreen", "RecyclerView atualizado com ${items.size} itens")
+                    } else {
+                        Log.e("PlanilhaScreen", "Erro na resposta: ${planilha.error}")
+                        Toast.makeText(this@PlanilhaScreen, planilha.error, Toast.LENGTH_SHORT).show()
+                    }
                 } else {
-                    handleErrorResponse(response)
+                    Log.e("PlanilhaScreen", "Resposta não foi bem-sucedida: ${response.code()} - ${response.message()}")
+                    Log.e("PlanilhaScreen", "Corpo de erro: ${response.errorBody()?.string()}")
+                    Toast.makeText(this@PlanilhaScreen, "Erro ao carregar a planilha: ${response.message()}", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<PlanilhaResponse>, t: Throwable) {
-                Log.e(TAG, "Falha na requisição: ${t.message}", t)
+                Log.e("PlanilhaScreen", "Falha na requisição: ${t.message}", t)
                 Toast.makeText(this@PlanilhaScreen, "Falha na conexão: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
-    private fun handleSuccessfulResponse(planilha: PlanilhaResponse, dataType: String) {
-        Log.d(TAG, "Dados da planilha: $planilha")
-
-        if (planilha.hasError()) {
-            Log.e(TAG, "Erro na resposta: ${planilha.error}")
-            Toast.makeText(this, planilha.error, Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val dayOfWeek = intent.getStringExtra("DAY_OF_WEEK")
-        planilhaTitle.text = when {
-            dayOfWeek != null -> "${if (dataType == "TRAINING") "Treinos" else "Dieta"} de ${planilha.name ?: "Usuário"} - $dayOfWeek"
-            else -> "${if (dataType == "TRAINING") "Treinos" else "Dieta"} de ${planilha.name ?: "Usuário"}"
-        }
-
-        val items = createPlanilhaItems(planilha, dataType, dayOfWeek)
-        adapter = PlanilhaAdapter(items)
-        planilhaRecyclerView.adapter = adapter
-        Log.d(TAG, "RecyclerView atualizado com ${items.size} itens")
-    }
-
-    private fun createPlanilhaItems(planilha: PlanilhaResponse, dataType: String, dayOfWeek: String? = null): List<PlanilhaItem> {
-        val items = mutableListOf<PlanilhaItem>()
-
-        if (dataType == "TRAINING" || dataType == "ALL") {
-            val trainings = planilha.getTrainingsSafe()
-                .filter { dayOfWeek == null || it.weekday?.equals(dayOfWeek, ignoreCase = true) == true }
-
-            if (trainings.isNotEmpty()) {
-                trainings.forEach { training ->
-                    val details = buildTrainingDetails(training)
-                    items.add(PlanilhaItem(
-                        title = training.getExerciseNameSafe(),
-                        details = details,
-                        type = "training"
-                    ))
-                }
-            } else {
-                items.add(PlanilhaItem(
-                    title = "Treinos",
-                    details = "Nenhum treino cadastrado${dayOfWeek?.let { " para $it" } ?: ""}.",
-                    type = "training"
-                ))
-            }
-        }
-
-        if (dataType == "DIET" || dataType == "ALL") {
-            val meals = planilha.getMealsSafe()
-                .filter { dayOfWeek == null || it.weekday?.equals(dayOfWeek, ignoreCase = true) == true }
-
-            if (meals.isNotEmpty()) {
-                meals.forEach { meal ->
-                    val details = buildMealDetails(meal)
-                    items.add(PlanilhaItem(
-                        title = meal.getMealTypeSafe(),
-                        details = details,
-                        type = "meal"
-                    ))
-                }
-            } else {
-                items.add(PlanilhaItem(
-                    title = "Refeições",
-                    details = "Nenhuma refeição cadastrada${dayOfWeek?.let { " para $it" } ?: ""}.",
-                    type = "meal"
-                ))
-            }
-        }
-
-        return items
-    }
-
-    private fun buildTrainingDetails(training: Training): String {
-        val details = StringBuilder()
-        details.append(training.getSeriesRepetitionsText())
-        if (training.hasVideo()) {
-            details.append(" (Vídeo disponível)")
-        }
-        if (!training.description.isNullOrEmpty()) {
-            details.append("\n${training.description}")
-        }
-        if (!training.weekday.isNullOrEmpty()) {
-            details.append("\nDia: ${training.weekday}")
-        }
-        return details.toString()
-    }
-
-    private fun buildMealDetails(meal: Meal): String {
-        val comidas = meal.getComidasSafe()
-        return if (comidas.isNotEmpty()) {
-            val comidasText = comidas.joinToString(", ") { comida ->
-                comida.getFullDescription()
-            }
-            val details = StringBuilder(comidasText)
-            if (!meal.weekday.isNullOrEmpty()) {
-                details.append("\nDia: ${meal.weekday}")
-            }
-            details.toString()
-        } else {
-            "Nenhuma comida cadastrada."
-        }
-    }
-
-    private fun handleErrorResponse(response: Response<PlanilhaResponse>) {
-        Log.e(TAG, "Resposta não foi bem-sucedida: ${response.code()} - ${response.message()}")
-        try {
-            val errorBody = response.errorBody()?.string()
-            Log.e(TAG, "Corpo de erro: $errorBody")
-        } catch (e: Exception) {
-            Log.e(TAG, "Erro ao ler corpo de erro: ${e.message}")
-        }
-        Toast.makeText(this, "Erro ao carregar a planilha: ${response.message()}", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun performLogout() {
-        Log.d(TAG, "Iniciando logout")
-        val sharedPreferences = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        val apiKey = sharedPreferences.getString("auth_token", null)
-        val deviceId = sharedPreferences.getString("device_id", null)
-        Log.d(TAG, "apiKey: $apiKey, deviceId: $deviceId")
-
-        if (apiKey != null && deviceId != null) {
-            val authHeader = "Bearer $apiKey"
-            RetrofitClient.apiService.logout(authHeader, deviceId).enqueue(object : Callback<ResponseBody> {
-                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                    Log.d(TAG, "Logout bem-sucedido: ${response.code()}")
-                    clearSessionAndNavigateToLogin()
-                }
-
-                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    Log.e(TAG, "Falha no logout: ${t.message}")
-                    clearSessionAndNavigateToLogin()
-                }
-            })
-        } else {
-            Log.w(TAG, "Nenhuma api_key ou device_id encontrado")
-            clearSessionAndNavigateToLogin()
-        }
-    }
-
     private fun clearSessionAndNavigateToLogin() {
-        Log.d(TAG, "Limpando sessão e navegando para login")
+        Log.d("PlanilhaScreen", "Limpando sessão e navegando para login")
         val sharedPreferences = getSharedPreferences("app_prefs", MODE_PRIVATE)
         sharedPreferences.edit().clear().apply()
 
