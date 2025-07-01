@@ -10,7 +10,7 @@ class PlanilhaAdapter(private val items: List<PlanilhaItem>) :
     RecyclerView.Adapter<PlanilhaAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val titleTextView: TextView = view.findViewById(R.id.tips_text)
+        val titleTextView: TextView = view.findViewById(R.id.day_title)
         val detailsTextView: TextView = view.findViewById(R.id.details_text)
     }
 

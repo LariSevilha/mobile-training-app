@@ -43,43 +43,10 @@
             android:visibility="gone" />
 
         <TextView
-            android:id="@+id/how_to_do_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="COMO FAZER:"
-            android:textColor="@color/gold_primary"
-            android:textSize="16sp"
-            android:fontFamily="sans-serif-medium"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
             android:id="@+id/how_to_do_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Instruções detalhadas de como executar o exercício."
-            android:textColor="@color/text_primary"
-            android:textSize="14sp"
-            android:layout_marginBottom="24dp"
-            android:background="@drawable/input_background"
-            android:padding="12dp" />
-
-        <TextView
-            android:id="@+id/tips_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="DICAS:"
-            android:textColor="@color/gold_primary"
-            android:textSize="16sp"
-            android:fontFamily="sans-serif-medium"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:id="@+id/tips_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Mantenha a postura correta e respire fundo."
             android:textColor="@color/text_primary"
             android:textSize="14sp"
             android:layout_marginBottom="24dp"
@@ -100,7 +67,15 @@
 
         <LinearLayout
             android:id="@+id/back_button_detail"
-            style="@style/GoldButtonStyle">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/back_button_style"
+            android:padding="12dp"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -9,9 +9,9 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 
 class ExerciseDetailActivity : AppCompatActivity() {
 
@@ -31,33 +31,38 @@ class ExerciseDetailActivity : AppCompatActivity() {
         exerciseTitle.text = "Como executar: $exerciseName".uppercase()
 
         val howToDoText = findViewById<TextView>(R.id.how_to_do_text)
-        howToDoText.text = "COMO FAZER:\n$exerciseDescription"
+        howToDoText.text = exerciseDescription
 
         val exerciseImage = findViewById<ImageView>(R.id.exercise_image)
-        if (!exercisePhotos.isNullOrEmpty()) {
+        if (!exercisePhotos.isNullOrEmpty() && exercisePhotos[0].isNotEmpty()) {
             exerciseImage.visibility = View.VISIBLE
-//            Glide.with(this)
-//                .load(exercisePhotos[0])
-//                .placeholder(android.R.color.transparent)
-//                .error(R.drawable.ic_error)
-//                .into(exerciseImage)
+            Glide.with(this)
+                .load(exercisePhotos[0])
+                .placeholder(android.R.color.transparent)
+                .error(R.drawable.ic_error)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(exerciseImage)
+        } else {
+            exerciseImage.visibility = View.GONE
         }
 
         val videoLink = findViewById<TextView>(R.id.video_link)
         if (!exerciseVideo.isNullOrEmpty()) {
             videoLink.visibility = View.VISIBLE
-            videoLink.text = "VEJA NA PRÁTICA: Clique para ver o vídeo"
             videoLink.setOnClickListener {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(exerciseVideo))
-                startActivity(intent)
+                try {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(exerciseVideo))
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    // Handle invalid or inaccessible URLs
+                    android.widget.Toast.makeText(this, "Não foi possível abrir o vídeo", android.widget.Toast.LENGTH_SHORT).show()
+                }
             }
+        } else {
+            videoLink.visibility = View.GONE
         }
 
         val backButton = findViewById<LinearLayout>(R.id.back_button_detail)
         backButton.setOnClickListener { finish() }
-
-        // Hide tips section since it's redundant
-        findViewById<TextView>(R.id.tips_title).visibility = View.GONE
-        findViewById<TextView>(R.id.tips_text).visibility = View.GONE
     }
 }

@@ -31,9 +31,7 @@ class DayDetailsScreen : ComponentActivity() {
         val detailsTable = findViewById<TableLayout>(R.id.details_text)
 
         val backButton = findViewById<LinearLayout>(R.id.back_button)
-        backButton.setOnClickListener {
-            finish()
-        }
+        backButton.setOnClickListener { finish() }
 
         val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
         val apiKey = sharedPrefs.getString("auth_token", null)
@@ -42,7 +40,7 @@ class DayDetailsScreen : ComponentActivity() {
         Log.d("DayDetailsScreen", "apiKey: $apiKey, deviceId: $deviceId")
 
         if (apiKey == null || deviceId == null) {
-            Log.e("DayDetailsScreen", "apiKey ou deviceId está nulo")
+            Log.e("DayDetailsScreen", "apiKey or deviceId is null")
             Toast.makeText(this, "Por favor, faça login novamente", Toast.LENGTH_SHORT).show()
             sharedPrefs.edit().clear().apply()
             val intent = Intent(this, MainActivity::class.java)
@@ -63,12 +61,12 @@ class DayDetailsScreen : ComponentActivity() {
         detailsTable: TableLayout
     ) {
         val authHeader = "Bearer $apiKey"
-        Log.d("DayDetailsScreen", "Carregando dados para $dayOfWeek com tipo $dataType")
+        Log.d("DayDetailsScreen", "Loading data for $dayOfWeek with type $dataType")
         RetrofitClient.apiService.getPlanilha(authHeader, deviceId).enqueue(object : Callback<PlanilhaResponse> {
             override fun onResponse(call: Call<PlanilhaResponse>, response: Response<PlanilhaResponse>) {
                 if (response.isSuccessful && response.body() != null) {
                     val planilha = response.body()!!
-                    Log.d("DayDetailsScreen", "Dados recebidos: $planilha")
+                    Log.d("DayDetailsScreen", "Data received: $planilha")
                     if (!planilha.hasError()) {
                         detailsTable.removeAllViews()
 
@@ -77,15 +75,22 @@ class DayDetailsScreen : ComponentActivity() {
                         if (weeklyPdf != null && weeklyPdf.pdfUrl != null) {
                             val row = TableRow(this@DayDetailsScreen)
                             val textView = TextView(this@DayDetailsScreen).apply {
-                                layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+                                layoutParams = TableRow.LayoutParams(
+                                    TableRow.LayoutParams.MATCH_PARENT,
+                                    TableRow.LayoutParams.WRAP_CONTENT
+                                )
                                 text = "PDF disponível para $dayOfWeek.\nClique aqui para visualizar: ${weeklyPdf.pdfUrl}"
                                 textSize = 14f
                                 setTextColor(0xFFFFFFFF.toInt())
                                 gravity = android.view.Gravity.CENTER
                                 setPadding(8, 8, 8, 8)
                                 setOnClickListener {
-                                    val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(weeklyPdf.pdfUrl))
-                                    startActivity(intent)
+                                    try {
+                                        val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(weeklyPdf.pdfUrl))
+                                        startActivity(intent)
+                                    } catch (e: Exception) {
+                                        Toast.makeText(this@DayDetailsScreen, "Não foi possível abrir o PDF", Toast.LENGTH_SHORT).show()
+                                    }
                                 }
                             }
                             row.addView(textView)
@@ -98,10 +103,18 @@ class DayDetailsScreen : ComponentActivity() {
                                 val headerRow = TableRow(this@DayDetailsScreen).apply {
                                     setBackgroundColor(0xFF2D2D2D.toInt())
                                     setPadding(8, 8, 8, 8)
+                                    layoutParams = TableRow.LayoutParams(
+                                        TableRow.LayoutParams.MATCH_PARENT,
+                                        TableRow.LayoutParams.WRAP_CONTENT
+                                    )
                                 }
                                 listOf("Exercício", "Séries", "Repetições", "Vídeo").forEach { header ->
                                     val textView = TextView(this@DayDetailsScreen).apply {
-                                        layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+                                        layoutParams = TableRow.LayoutParams(
+                                            0,
+                                            TableRow.LayoutParams.WRAP_CONTENT,
+                                            1f
+                                        )
                                         text = header
                                         textSize = 14f
                                         setTextColor(0xFFCEAC5E.toInt())
@@ -114,9 +127,17 @@ class DayDetailsScreen : ComponentActivity() {
 
                                 val trainings = planilha.getTrainingsSafe().filter { it.weekday == backendDay }
                                 if (trainings.isEmpty()) {
-                                    val row = TableRow(this@DayDetailsScreen)
+                                    val row = TableRow(this@DayDetailsScreen).apply {
+                                        layoutParams = TableRow.LayoutParams(
+                                            TableRow.LayoutParams.MATCH_PARENT,
+                                            TableRow.LayoutParams.WRAP_CONTENT
+                                        )
+                                    }
                                     val textView = TextView(this@DayDetailsScreen).apply {
-                                        layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+                                        layoutParams = TableRow.LayoutParams(
+                                            TableRow.LayoutParams.MATCH_PARENT,
+                                            TableRow.LayoutParams.WRAP_CONTENT
+                                        )
                                         text = "Nenhum treino disponível para $dayOfWeek."
                                         textSize = 14f
                                         setTextColor(0xFFFFFFFF.toInt())
@@ -129,24 +150,50 @@ class DayDetailsScreen : ComponentActivity() {
                                     trainings.forEach { training ->
                                         val row = TableRow(this@DayDetailsScreen).apply {
                                             setPadding(8, 8, 8, 8)
+                                            layoutParams = TableRow.LayoutParams(
+                                                TableRow.LayoutParams.MATCH_PARENT,
+                                                TableRow.LayoutParams.WRAP_CONTENT
+                                            )
                                         }
-                                        listOf(
+
+                                        val columnValues = listOf(
                                             training.exerciseName ?: "Não especificado",
                                             training.serieAmount?.toString() ?: "N/A",
                                             training.repeatAmount?.toString() ?: "N/A",
                                             if (training.video.isNullOrEmpty()) "N/A" else "Ver vídeo"
-                                        ).forEachIndexed { index, value ->
+                                        )
+
+                                        columnValues.forEachIndexed { index, value ->
                                             val textView = TextView(this@DayDetailsScreen).apply {
-                                                layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+                                                layoutParams = TableRow.LayoutParams(
+                                                    0,
+                                                    TableRow.LayoutParams.WRAP_CONTENT,
+                                                    1f
+                                                )
                                                 text = value
                                                 textSize = 14f
                                                 setTextColor(0xFFFFFFFF.toInt())
                                                 gravity = android.view.Gravity.CENTER
                                                 setPadding(8, 8, 8, 8)
-                                                if (index == 3 && !training.video.isNullOrEmpty()) {
-                                                    setOnClickListener {
-                                                        val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(training.video))
-                                                        startActivity(intent)
+
+                                                when (index) {
+                                                    0 -> {
+                                                        setOnClickListener {
+                                                            openExerciseDetail(training)
+                                                        }
+                                                        setTextColor(0xFFCEAC5E.toInt())
+                                                    }
+                                                    3 -> {
+                                                        if (!training.video.isNullOrEmpty()) {
+                                                            setOnClickListener {
+                                                                try {
+                                                                    val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(training.video))
+                                                                    startActivity(intent)
+                                                                } catch (e: Exception) {
+                                                                    Toast.makeText(this@DayDetailsScreen, "Não foi possível abrir o vídeo", Toast.LENGTH_SHORT).show()
+                                                                }
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
@@ -161,10 +208,18 @@ class DayDetailsScreen : ComponentActivity() {
                                 val headerRow = TableRow(this@DayDetailsScreen).apply {
                                     setBackgroundColor(0xFF2D2D2D.toInt())
                                     setPadding(8, 8, 8, 8)
+                                    layoutParams = TableRow.LayoutParams(
+                                        TableRow.LayoutParams.MATCH_PARENT,
+                                        TableRow.LayoutParams.WRAP_CONTENT
+                                    )
                                 }
                                 listOf("Refeição", "Itens").forEach { header ->
                                     val textView = TextView(this@DayDetailsScreen).apply {
-                                        layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+                                        layoutParams = TableRow.LayoutParams(
+                                            0,
+                                            TableRow.LayoutParams.WRAP_CONTENT,
+                                            1f
+                                        )
                                         text = header
                                         textSize = 14f
                                         setTextColor(0xFFCEAC5E.toInt())
@@ -177,9 +232,17 @@ class DayDetailsScreen : ComponentActivity() {
 
                                 val meals = planilha.getMealsSafe().filter { it.weekday == backendDay }
                                 if (meals.isEmpty()) {
-                                    val row = TableRow(this@DayDetailsScreen)
+                                    val row = TableRow(this@DayDetailsScreen).apply {
+                                        layoutParams = TableRow.LayoutParams(
+                                            TableRow.LayoutParams.MATCH_PARENT,
+                                            TableRow.LayoutParams.WRAP_CONTENT
+                                        )
+                                    }
                                     val textView = TextView(this@DayDetailsScreen).apply {
-                                        layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+                                        layoutParams = TableRow.LayoutParams(
+                                            TableRow.LayoutParams.MATCH_PARENT,
+                                            TableRow.LayoutParams.WRAP_CONTENT
+                                        )
                                         text = "Nenhuma refeição disponível para $dayOfWeek."
                                         textSize = 14f
                                         setTextColor(0xFFFFFFFF.toInt())
@@ -192,6 +255,10 @@ class DayDetailsScreen : ComponentActivity() {
                                     meals.forEach { meal ->
                                         val row = TableRow(this@DayDetailsScreen).apply {
                                             setPadding(8, 8, 8, 8)
+                                            layoutParams = TableRow.LayoutParams(
+                                                TableRow.LayoutParams.MATCH_PARENT,
+                                                TableRow.LayoutParams.WRAP_CONTENT
+                                            )
                                         }
                                         val comidaText = if (meal.comidas.isNullOrEmpty()) {
                                             "Nenhum item disponível"
@@ -205,7 +272,11 @@ class DayDetailsScreen : ComponentActivity() {
                                             comidaText
                                         ).forEach { value ->
                                             val textView = TextView(this@DayDetailsScreen).apply {
-                                                layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+                                                layoutParams = TableRow.LayoutParams(
+                                                    0,
+                                                    TableRow.LayoutParams.WRAP_CONTENT,
+                                                    1f
+                                                )
                                                 text = value
                                                 textSize = 14f
                                                 setTextColor(0xFFFFFFFF.toInt())
@@ -220,9 +291,17 @@ class DayDetailsScreen : ComponentActivity() {
                             }
 
                             else -> {
-                                val row = TableRow(this@DayDetailsScreen)
+                                val row = TableRow(this@DayDetailsScreen).apply {
+                                    layoutParams = TableRow.LayoutParams(
+                                        TableRow.LayoutParams.MATCH_PARENT,
+                                        TableRow.LayoutParams.WRAP_CONTENT
+                                    )
+                                }
                                 val textView = TextView(this@DayDetailsScreen).apply {
-                                    layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+                                    layoutParams = TableRow.LayoutParams(
+                                        TableRow.LayoutParams.MATCH_PARENT,
+                                        TableRow.LayoutParams.WRAP_CONTENT
+                                    )
                                     text = "Tipo de dados inválido."
                                     textSize = 14f
                                     setTextColor(0xFFFFFFFF.toInt())
@@ -248,11 +327,81 @@ class DayDetailsScreen : ComponentActivity() {
             }
 
             override fun onFailure(call: Call<PlanilhaResponse>, t: Throwable) {
-                Log.e("DayDetailsScreen", "Falha na requisição: ${t.message}", t)
+                Log.e("DayDetailsScreen", "Request failed: ${t.message}", t)
                 Toast.makeText(this@DayDetailsScreen, "Falha na conexão: ${t.message}", Toast.LENGTH_SHORT).show()
                 finish()
             }
         })
+    }
+
+    private fun openExerciseDetail(training: Any) {
+        val intent = Intent(this, ExerciseDetailActivity::class.java).apply {
+            putExtra("EXERCISE_NAME", getExerciseName(training))
+            putExtra("EXERCISE_DESCRIPTION", getExerciseDescription(training))
+            putExtra("EXERCISE_VIDEO", getExerciseVideo(training))
+            putExtra("EXERCISE_PHOTOS", getExercisePhotos(training))
+        }
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            Log.e("DayDetailsScreen", "Failed to start ExerciseDetailActivity: ${e.message}", e)
+            Toast.makeText(this, "Erro ao abrir detalhes do exercício", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun getExerciseName(training: Any): String {
+        return try {
+            val field = training.javaClass.getDeclaredField("exerciseName")
+            field.isAccessible = true
+            field.get(training) as? String ?: "Nome não disponível"
+        } catch (e: Exception) {
+            Log.w("DayDetailsScreen", "Failed to get exerciseName: ${e.message}")
+            "Nome não disponível"
+        }
+    }
+
+    private fun getExerciseDescription(training: Any): String {
+        return try {
+            val field = training.javaClass.getDeclaredField("description")
+            field.isAccessible = true
+            field.get(training) as? String ?: "Descrição não disponível"
+        } catch (e: Exception) {
+            try {
+                val field = training.javaClass.getDeclaredField("howToDo")
+                field.isAccessible = true
+                field.get(training) as? String ?: "Descrição não disponível"
+            } catch (e2: Exception) {
+                Log.w("DayDetailsScreen", "Failed to get description: ${e.message}")
+                "Descrição não disponível"
+            }
+        }
+    }
+
+    private fun getExerciseVideo(training: Any): String? {
+        return try {
+            val field = training.javaClass.getDeclaredField("video")
+            field.isAccessible = true
+            field.get(training) as? String
+        } catch (e: Exception) {
+            Log.w("DayDetailsScreen", "Failed to get video: ${e.message}")
+            null
+        }
+    }
+
+    private fun getExercisePhotos(training: Any): Array<String>? {
+        return try {
+            val field = training.javaClass.getDeclaredField("photos")
+            field.isAccessible = true
+            val photos = field.get(training)
+            when (photos) {
+                is Array<*> -> photos.map { it.toString() }.toTypedArray()
+                is List<*> -> photos.map { it.toString() }.toTypedArray()
+                else -> null
+            }
+        } catch (e: Exception) {
+            Log.w("DayDetailsScreen", "Failed to get photos: ${e.message}")
+            null
+        }
     }
 
     private fun mapDayToBackendFormat(dayOfWeek: String): String {

@@ -29,5 +29,6 @@
         <activity android:name=".DaysOfWeekScreen" /> <!-- Corrigido de DayOfWeekScreen para DaysOfWeekScreen -->
         <activity android:name=".DayDetailsScreen" />
         <activity android:name=".ExerciseDetailActivity" />
+
     </application>
 </manifest>
