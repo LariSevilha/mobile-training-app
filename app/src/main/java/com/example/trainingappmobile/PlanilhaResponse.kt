@@ -11,7 +11,7 @@ data class PlanilhaResponse(
     @SerializedName("registration_date") val registrationDate: String? = null,
     @SerializedName("expiration_date") val expirationDate: String? = null,
     @SerializedName("plan_type") val planType: String? = null,
-    @SerializedName("plan_duration") val planDuration: Int? = null,
+    @SerializedName("plan_duration") val planDuration: String? = null,
     @SerializedName("error") val error: String? = null,
     @SerializedName("trainings") val trainings: List<Training>? = null,
     @SerializedName("meals") val meals: List<Meal>? = null,
@@ -44,8 +44,8 @@ data class PlanilhaResponse(
 
 data class Training(
     val id: Int? = null,
-    @SerializedName("serie_amount") val serieAmount: Int? = null,
-    @SerializedName("repeat_amount") val repeatAmount: Int? = null,
+    @SerializedName("serie_amount") val serieAmount: String? = null,
+    @SerializedName("repeat_amount") val repeatAmount: String? = null,
     @SerializedName("exercise_name") val exerciseName: String? = null,
     @SerializedName("video") val video: String? = null,
     @SerializedName("description") val description: String? = null,
@@ -53,7 +53,7 @@ data class Training(
     @SerializedName("photo_urls") val photoUrls: List<String>? = null
 ) {
     fun getExerciseNameSafe(): String = exerciseName ?: "Nome do exercício não definido"
-    fun getSeriesRepetitionsText(): String = "Séries: ${serieAmount ?: 0}, Repetições: ${repeatAmount ?: 0}"
+    fun getSeriesRepetitionsText(): String = "Séries: ${serieAmount ?: "0"}, Repetições: ${repeatAmount ?: "0"}"
     fun hasVideo(): Boolean = !video.isNullOrEmpty()
     fun hasPhotos(): Boolean = !photoUrls.isNullOrEmpty()
     fun getPhotoUrlsSafe(): List<String> = photoUrls ?: emptyList()
@@ -72,9 +72,9 @@ data class Meal(
 data class Comida(
     val id: Int? = null,
     @SerializedName("name") val name: String? = null,
-    @SerializedName("amount") val amount: Int? = null
+    @SerializedName("amount") val amount: String? = null
 ) {
-    fun getFullDescription(): String = "${name ?: "Comida não definida"} - Quantidade: ${amount ?: 0}"
+    fun getFullDescription(): String = "${name ?: "Comida não definida"} - Quantidade: ${amount ?: "0"}"
 }
 
 data class WeeklyPdf(
