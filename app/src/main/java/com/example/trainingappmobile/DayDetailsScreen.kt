@@ -334,20 +334,19 @@ class DayDetailsScreen : ComponentActivity() {
         })
     }
 
-    private fun openExerciseDetail(training: Any) {
+    private fun openExerciseDetail(training: Training) {
         val intent = Intent(this, ExerciseDetailActivity::class.java).apply {
-            putExtra("EXERCISE_NAME", getExerciseName(training))
-            putExtra("EXERCISE_DESCRIPTION", getExerciseDescription(training))
-            putExtra("EXERCISE_VIDEO", getExerciseVideo(training))
-            putExtra("EXERCISE_PHOTOS", getExercisePhotos(training))
+            putExtra("EXERCISE_NAME", training.getExerciseNameSafe())
+            putExtra("EXERCISE_DESCRIPTION", training.description ?: "Descrição não disponível.")
+            putExtra("EXERCISE_VIDEO", training.video)
+            putExtra("EXERCISE_PHOTOS", training.getPhotoUrlsSafe().toTypedArray())
+            putExtra("SERIE_AMOUNT", training.serieAmount ?: "0")
+            putExtra("REPEAT_AMOUNT", training.repeatAmount ?: "0")
+            putExtra("WEEKDAY", training.weekday ?: "Não definido")
         }
-        try {
-            startActivity(intent)
-        } catch (e: Exception) {
-            Log.e("DayDetailsScreen", "Failed to start ExerciseDetailActivity: ${e.message}", e)
-            Toast.makeText(this, "Erro ao abrir detalhes do exercício", Toast.LENGTH_SHORT).show()
-        }
+        startActivity(intent)
     }
+
 
     private fun getExerciseName(training: Any): String {
         return try {
