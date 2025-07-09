@@ -84,3 +84,4 @@ data class WeeklyPdf(
 ) {
     fun getWeekdaySafe(): String = weekday ?: "Dia não definido"
 }
+

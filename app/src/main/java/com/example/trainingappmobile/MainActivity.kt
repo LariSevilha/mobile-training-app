@@ -2,6 +2,7 @@ package com.example.trainingappmobile
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -10,7 +11,9 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import retrofit2.Call
 import retrofit2.Callback
@@ -27,6 +30,9 @@ class MainActivity : AppCompatActivity() {
         private const val KEY_REMEMBER_ME = "remember_me"
         private const val KEY_SAVED_EMAIL = "saved_email"
         private const val KEY_SAVED_PASSWORD = "saved_password"
+
+        // URL da sua política de privacidade (substitua pela URL real)
+        private const val PRIVACY_POLICY_URL = "https://seusite.com/politica-privacidade"
     }
 
     private lateinit var sharedPrefs: SharedPreferences
@@ -35,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var loginButton: LinearLayout
     private lateinit var rememberMeCheckbox: CheckBox
     private lateinit var passwordToggle: ImageView
+    private lateinit var privacyPolicyLink: TextView
     private var authToken: String? = null
     private var deviceId: String? = null
 
@@ -63,6 +70,7 @@ class MainActivity : AppCompatActivity() {
         loginButton = findViewById(R.id.login_button)
         rememberMeCheckbox = findViewById(R.id.remember_me_checkbox)
         passwordToggle = findViewById(R.id.password_toggle)
+        privacyPolicyLink = findViewById(R.id.privacy_policy_link)
     }
 
     private fun initSharedPreferences() {
@@ -83,6 +91,10 @@ class MainActivity : AppCompatActivity() {
 
         passwordToggle.setOnClickListener {
             togglePasswordVisibility()
+        }
+
+        privacyPolicyLink.setOnClickListener {
+            showPrivacyPolicyDialog()
         }
     }
 
@@ -227,11 +239,72 @@ class MainActivity : AppCompatActivity() {
         val isPasswordVisible = passwordEditText.inputType == android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
         if (isPasswordVisible) {
             passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-            passwordToggle.setImageResource(R.drawable.ic_eye) // Replace with closed eye drawable
+            passwordToggle.setImageResource(R.drawable.ic_eye)
         } else {
             passwordEditText.inputType = android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-            passwordToggle.setImageResource(R.drawable.ic_eye_open) // Replace with open eye drawable
+            passwordToggle.setImageResource(R.drawable.ic_eye_open)
         }
-        passwordEditText.setSelection(passwordEditText.text.length) // Move cursor to end
+        passwordEditText.setSelection(passwordEditText.text.length)
+    }
+
+    private fun showPrivacyPolicyDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Política de Privacidade")
+            .setMessage("Você gostaria de:\n\n• Ver a política de privacidade completa no navegador\n• Ou ver um resumo aqui")
+            .setPositiveButton("Ver Completa") { _, _ ->
+                openPrivacyPolicyInBrowser()
+            }
+            .setNegativeButton("Ver Resumo") { _, _ ->
+                showPrivacyPolicySummary()
+            }
+            .setNeutralButton("Cancelar", null)
+            .show()
+    }
+
+    private fun openPrivacyPolicyInBrowser() {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(PRIVACY_POLICY_URL))
+            startActivity(intent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao abrir política de privacidade", e)
+            showToast("Erro ao abrir o navegador. Tente novamente.")
+        }
+    }
+
+    private fun showPrivacyPolicySummary() {
+        val summaryText = """
+            📋 RESUMO DA POLÍTICA DE PRIVACIDADE
+            
+            🔐 Dados Coletados:
+            • Email e senha para autenticação
+            • ID do dispositivo para segurança
+            • Dados de uso do aplicativo
+            
+            🛡️ Como Protegemos:
+            • Criptografia de dados sensíveis
+            • Armazenamento seguro
+            • Acesso restrito às informações
+            
+            📊 Uso das Informações:
+            • Autenticação e acesso ao app
+            • Melhorias na experiência do usuário
+            • Suporte técnico quando necessário
+            
+            🚫 Não Compartilhamos:
+            • Seus dados não são vendidos
+            • Sem compartilhamento com terceiros
+            • Privacidade é nossa prioridade
+            
+            Para mais detalhes, acesse a política completa.
+        """.trimIndent()
+
+        AlertDialog.Builder(this)
+            .setTitle("Resumo - Política de Privacidade")
+            .setMessage(summaryText)
+            .setPositiveButton("Ver Política Completa") { _, _ ->
+                openPrivacyPolicyInBrowser()
+            }
+            .setNegativeButton("Entendi", null)
+            .show()
     }
 }

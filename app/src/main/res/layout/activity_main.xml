@@ -55,18 +55,6 @@
             android:padding="12dp"
             android:inputType="textPassword" />
 
-<!--        <EditText-->
-<!--            android:id="@+id/passwordEditText"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:background="@android:color/transparent"-->
-<!--            android:hint="Senha"-->
-<!--            android:textColorHint="#CCCCCC"-->
-<!--            android:inputType="textPassword"-->
-<!--            android:padding="12dp"-->
-<!--            android:textColor="#FFFFFF" />-->
-
-
         <ImageView
             android:id="@+id/password_toggle"
             android:layout_width="48dp"
@@ -82,7 +70,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="24dp">
+        android:layout_marginBottom="16dp">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -106,6 +94,31 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <!-- Aviso de Política de Privacidade -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ao continuar, você concorda com os"
+        android:textColor="#94A3B8"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/privacy_policy_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Termos de Uso e Política de Privacidade"
+        android:textColor="#CEAC5E"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="8dp"
+        android:layout_marginBottom="16dp"
+        android:textStyle="bold" />
 
     <LinearLayout
         android:id="@+id/login_button"

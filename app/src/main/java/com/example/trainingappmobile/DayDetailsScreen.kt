@@ -18,18 +18,17 @@ class DayDetailsScreen : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_day_details)
+        setContentView(R.layout.activity_day_details) // Updated to use new layout
 
         window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
 
         val dayOfWeek = intent.getStringExtra("DAY_OF_WEEK") ?: "Segunda-feira"
         val dataType = intent.getStringExtra("DATA_TYPE") ?: "TRAINING"
 
-        val dayTitle = findViewById<TextView>(R.id.day_title)
+        val dayTitle = findViewById<TextView>(R.id.weekday_text)
         dayTitle.text = "Detalhes de $dayOfWeek"
 
-        val detailsTable = findViewById<TableLayout>(R.id.details_text)
-
+        val detailsTable = findViewById<TableLayout>(R.id.details_table)
         val backButton = findViewById<LinearLayout>(R.id.back_button)
         backButton.setOnClickListener { finish() }
 
@@ -336,71 +335,15 @@ class DayDetailsScreen : ComponentActivity() {
 
     private fun openExerciseDetail(training: Training) {
         val intent = Intent(this, ExerciseDetailActivity::class.java).apply {
-            putExtra("EXERCISE_NAME", training.getExerciseNameSafe())
-            putExtra("EXERCISE_DESCRIPTION", training.description ?: "Descrição não disponível.")
+            putExtra("EXERCISE_NAME", training.exerciseName ?: "Nome não disponível")
+            putExtra("EXERCISE_DESCRIPTION", training.description ?: "Descrição não disponível")
             putExtra("EXERCISE_VIDEO", training.video)
             putExtra("EXERCISE_PHOTOS", training.getPhotoUrlsSafe().toTypedArray())
-            putExtra("SERIE_AMOUNT", training.serieAmount ?: "0")
-            putExtra("REPEAT_AMOUNT", training.repeatAmount ?: "0")
+            putExtra("SERIE_AMOUNT", training.serieAmount?.toString() ?: "0")
+            putExtra("REPEAT_AMOUNT", training.repeatAmount?.toString() ?: "0")
             putExtra("WEEKDAY", training.weekday ?: "Não definido")
         }
         startActivity(intent)
-    }
-
-
-    private fun getExerciseName(training: Any): String {
-        return try {
-            val field = training.javaClass.getDeclaredField("exerciseName")
-            field.isAccessible = true
-            field.get(training) as? String ?: "Nome não disponível"
-        } catch (e: Exception) {
-            Log.w("DayDetailsScreen", "Failed to get exerciseName: ${e.message}")
-            "Nome não disponível"
-        }
-    }
-
-    private fun getExerciseDescription(training: Any): String {
-        return try {
-            val field = training.javaClass.getDeclaredField("description")
-            field.isAccessible = true
-            field.get(training) as? String ?: "Descrição não disponível"
-        } catch (e: Exception) {
-            try {
-                val field = training.javaClass.getDeclaredField("howToDo")
-                field.isAccessible = true
-                field.get(training) as? String ?: "Descrição não disponível"
-            } catch (e2: Exception) {
-                Log.w("DayDetailsScreen", "Failed to get description: ${e.message}")
-                "Descrição não disponível"
-            }
-        }
-    }
-
-    private fun getExerciseVideo(training: Any): String? {
-        return try {
-            val field = training.javaClass.getDeclaredField("video")
-            field.isAccessible = true
-            field.get(training) as? String
-        } catch (e: Exception) {
-            Log.w("DayDetailsScreen", "Failed to get video: ${e.message}")
-            null
-        }
-    }
-
-    private fun getExercisePhotos(training: Any): Array<String>? {
-        return try {
-            val field = training.javaClass.getDeclaredField("photos")
-            field.isAccessible = true
-            val photos = field.get(training)
-            when (photos) {
-                is Array<*> -> photos.map { it.toString() }.toTypedArray()
-                is List<*> -> photos.map { it.toString() }.toTypedArray()
-                else -> null
-            }
-        } catch (e: Exception) {
-            Log.w("DayDetailsScreen", "Failed to get photos: ${e.message}")
-            null
-        }
     }
 
     private fun mapDayToBackendFormat(dayOfWeek: String): String {
@@ -430,3 +373,4 @@ class DayDetailsScreen : ComponentActivity() {
         finish()
     }
 }
+
