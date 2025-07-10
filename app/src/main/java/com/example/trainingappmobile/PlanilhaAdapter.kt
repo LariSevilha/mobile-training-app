@@ -11,7 +11,6 @@ class PlanilhaAdapter(private val items: List<PlanilhaItem>) :
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titleTextView: TextView = view.findViewById(R.id.planilha_title)
-        val detailsTextView: TextView = view.findViewById(R.id.details_table)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -23,7 +22,6 @@ class PlanilhaAdapter(private val items: List<PlanilhaItem>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
         holder.titleTextView.text = item.title
-        holder.detailsTextView.text = item.details
     }
 
     override fun getItemCount(): Int = items.size
