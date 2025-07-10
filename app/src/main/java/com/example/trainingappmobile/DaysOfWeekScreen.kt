@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 
 class DaysOfWeekScreen : ComponentActivity() {
@@ -57,19 +58,27 @@ class DaysOfWeekScreen : ComponentActivity() {
 
         // Configurar clique no botão de voltar
         backButton.setOnClickListener {
+            Log.d("DaysOfWeekScreen", "Botão Voltar clicado")
             finish()
         }
     }
 
     private fun navigateToDayDetails(dayOfWeek: String, dataType: String) {
         Log.d("DaysOfWeekScreen", "Navegando para DayDetailsScreen - Dia: $dayOfWeek, Tipo: $dataType")
-        val intent = Intent(this, DayDetailsScreen::class.java)
-        intent.putExtra("DAY_OF_WEEK", dayOfWeek)
-        intent.putExtra("DATA_TYPE", dataType)
-        startActivity(intent)
+        try {
+            val intent = Intent(this, DayDetailsScreen::class.java)
+            intent.putExtra("DAY_OF_WEEK", dayOfWeek)
+            intent.putExtra("DATA_TYPE", dataType)
+            startActivity(intent)
+            Log.d("DaysOfWeekScreen", "Intent iniciado com sucesso para DayDetailsScreen")
+        } catch (e: Exception) {
+            Log.e("DaysOfWeekScreen", "Erro ao iniciar DayDetailsScreen: ${e.message}, stacktrace: ${e.stackTraceToString()}")
+            Toast.makeText(this, "Erro ao navegar: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onBackPressed() {
+        Log.d("DaysOfWeekScreen", "onBackPressed chamado")
         super.onBackPressed()
         finish()
     }

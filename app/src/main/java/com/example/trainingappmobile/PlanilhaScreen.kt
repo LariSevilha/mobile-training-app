@@ -32,7 +32,7 @@ class PlanilhaScreen : ComponentActivity() {
         // Configurar o botão de logout
         findViewById<Button>(R.id.logout_button)?.setOnClickListener {
             Log.d("PlanilhaScreen", "Botão de logout clicado")
-            // performLogout()
+            clearSessionAndNavigateToLogin()
         }
 
         // Configurar o botão de voltar
@@ -49,9 +49,7 @@ class PlanilhaScreen : ComponentActivity() {
         if (apiKey == null || deviceId == null) {
             Log.e("PlanilhaScreen", "auth_token ou deviceId está nulo")
             Toast.makeText(this, "Por favor, faça login novamente", Toast.LENGTH_SHORT).show()
-            sharedPrefs.edit().clear().apply()
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
+            clearSessionAndNavigateToLogin()
             return
         }
 
