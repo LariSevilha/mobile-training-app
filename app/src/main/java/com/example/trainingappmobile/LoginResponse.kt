@@ -11,3 +11,4 @@ data class LoginResponse(
     fun hasError(): Boolean = !error.isNullOrEmpty()
     fun isSuccessful(): Boolean = !apiKey.isNullOrEmpty()
 }
+

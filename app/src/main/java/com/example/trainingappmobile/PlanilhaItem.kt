@@ -5,3 +5,4 @@ data class PlanilhaItem(
     val details: String,
     val type: String
 )
+

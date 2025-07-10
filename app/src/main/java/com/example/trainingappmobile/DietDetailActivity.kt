@@ -14,19 +14,17 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class DietDetailsScreen : ComponentActivity() {
+class DietDetailActivity : ComponentActivity() {
 
     private lateinit var mealTitle: TextView
-    private lateinit var weekdayText: TextView
     private lateinit var ingredientsText: TextView
     private lateinit var preparationText: TextView
     private lateinit var mealImage: ImageView
-    private lateinit var noImageText: TextView
     private lateinit var videoLink: TextView
     private lateinit var backButton: LinearLayout
 
     companion object {
-        private const val TAG = "DietDetailsScreen"
+        private const val TAG = "DietDetailActivity"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,11 +34,9 @@ class DietDetailsScreen : ComponentActivity() {
         // Inicializar views
         try {
             mealTitle = findViewById(R.id.meal_title)
-            weekdayText = findViewById(R.id.weekday_text)
             ingredientsText = findViewById(R.id.ingredients_text)
             preparationText = findViewById(R.id.preparation_text)
             mealImage = findViewById(R.id.meal_image)
-            noImageText = findViewById(R.id.no_image_text)
             videoLink = findViewById(R.id.video_link)
             backButton = findViewById(R.id.back_button_detail)
         } catch (e: Exception) {
@@ -58,7 +54,7 @@ class DietDetailsScreen : ComponentActivity() {
 
         // Recuperar dados do Intent
         val dayOfWeek = intent.getStringExtra("DAY_OF_WEEK") ?: "Dia não especificado"
-        Log.d(TAG, "Dia recebido: $dayOfWeek")
+        Log.d(TAG, "Dados recebidos - Dia: $dayOfWeek")
 
         // Configurar título inicial
         mealTitle.text = "Dieta de $dayOfWeek"
@@ -81,6 +77,8 @@ class DietDetailsScreen : ComponentActivity() {
         }
 
         val authHeader = "Bearer $apiKey"
+        Log.d(TAG, "Carregando detalhes da dieta com authHeader=$authHeader, deviceId=$deviceId")
+
         RetrofitClient.apiService.getPlanilha(authHeader, deviceId).enqueue(object : Callback<PlanilhaResponse> {
             override fun onResponse(call: Call<PlanilhaResponse>, response: Response<PlanilhaResponse>) {
                 Log.d(TAG, "Resposta recebida: ${response.code()}")
@@ -90,7 +88,7 @@ class DietDetailsScreen : ComponentActivity() {
 
                     if (planilha.hasError()) {
                         Log.e(TAG, "Erro na resposta: ${planilha.error}")
-                        Toast.makeText(this@DietDetailsScreen, planilha.error, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@DietDetailActivity, planilha.error, Toast.LENGTH_SHORT).show()
                         updateNoDataUI("Erro ao carregar dados: ${planilha.error}")
                         return
                     }
@@ -98,14 +96,16 @@ class DietDetailsScreen : ComponentActivity() {
                     handleDietData(planilha, dayOfWeek)
                 } else {
                     Log.e(TAG, "Resposta não foi bem-sucedida: ${response.code()} - ${response.message()}")
-                    Toast.makeText(this@DietDetailsScreen, "Erro ao carregar detalhes", Toast.LENGTH_SHORT).show()
+                    val errorBody = response.errorBody()?.string()
+                    Log.e(TAG, "Error body: $errorBody")
+                    Toast.makeText(this@DietDetailActivity, "Erro ao carregar detalhes", Toast.LENGTH_SHORT).show()
                     updateNoDataUI("Erro ao carregar dados")
                 }
             }
 
             override fun onFailure(call: Call<PlanilhaResponse>, t: Throwable) {
                 Log.e(TAG, "Falha na requisição: ${t.message}", t)
-                Toast.makeText(this@DietDetailsScreen, "Falha na conexão: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@DietDetailActivity, "Falha na conexão: ${t.message}", Toast.LENGTH_SHORT).show()
                 updateNoDataUI("Falha na conexão")
             }
         })
@@ -114,6 +114,10 @@ class DietDetailsScreen : ComponentActivity() {
     private fun handleDietData(planilha: PlanilhaResponse, dayOfWeek: String) {
         val meals = planilha.getMealsSafe()
         Log.d(TAG, "Total de refeições: ${meals.size}")
+
+        meals.forEachIndexed { index, meal ->
+            Log.d(TAG, "Refeição $index: weekday='${meal.weekday}', type='${meal.mealType}'")
+        }
 
         val matchingMeals = meals.filter { meal ->
             meal.weekday?.let { weekday ->
@@ -144,27 +148,6 @@ class DietDetailsScreen : ComponentActivity() {
         updateDietUI(meal)
     }
 
-    private fun isDayMatch(targetDay: String, trainingDay: String): Boolean {
-        val normalizedTarget = normalizeDayName(targetDay)
-        val normalizedTraining = normalizeDayName(trainingDay)
-
-        val dayMappings = mapOf(
-            "segunda" to listOf("segunda", "segunda-feira", "seg", "monday", "mon"),
-            "terça" to listOf("terça", "terça-feira", "ter", "tuesday", "tue"),
-            "quarta" to listOf("quarta", "quarta-feira", "qua", "wednesday", "wed"),
-            "quinta" to listOf("quinta", "quinta-feira", "qui", "thursday", "thu"),
-            "sexta" to listOf("sexta", "sexta-feira", "sex", "friday", "fri"),
-            "sábado" to listOf("sábado", "sabado", "sab", "saturday", "sat"),
-            "domingo" to listOf("domingo", "dom", "sunday", "sun")
-        )
-
-        if (normalizedTarget == normalizedTraining) return true
-        for ((key, variants) in dayMappings) {
-            if (variants.contains(normalizedTarget) && variants.contains(normalizedTraining)) return true
-        }
-        return false
-    }
-
     private fun normalizeDayName(day: String): String {
         return day.lowercase()
             .replace("á", "a")
@@ -181,38 +164,76 @@ class DietDetailsScreen : ComponentActivity() {
             .trim()
     }
 
+    private fun isDayMatch(targetDay: String, mealDay: String): Boolean {
+        val normalizedTarget = normalizeDayName(targetDay)
+        val normalizedMeal = normalizeDayName(mealDay)
+
+        Log.d(TAG, "Comparando dias: '$normalizedTarget' vs '$normalizedMeal'")
+
+        val dayMappings = mapOf(
+            "segunda" to listOf("segunda", "segunda-feira", "seg", "monday", "mon"),
+            "terça" to listOf("terça", "terça-feira", "ter", "tuesday", "tue"),
+            "quarta" to listOf("quarta", "quarta-feira", "qua", "wednesday", "wed"),
+            "quinta" to listOf("quinta", "quinta-feira", "qui", "thursday", "thu"),
+            "sexta" to listOf("sexta", "sexta-feira", "sex", "friday", "fri"),
+            "sábado" to listOf("sábado", "sabado", "sab", "saturday", "sat"),
+            "domingo" to listOf("domingo", "dom", "sunday", "sun")
+        )
+
+        if (normalizedTarget == normalizedMeal) {
+            Log.d(TAG, "Match exato encontrado")
+            return true
+        }
+
+        for ((key, variants) in dayMappings) {
+            if (variants.contains(normalizedTarget) && variants.contains(normalizedMeal)) {
+                Log.d(TAG, "Match por mapeamento encontrado para $key")
+                return true
+            }
+        }
+
+        val targetWords = normalizedTarget.split(" ", "-")
+        val mealWords = normalizedMeal.split(" ", "-")
+
+        for (targetWord in targetWords) {
+            if (targetWord.length >= 3) {
+                for (mealWord in mealWords) {
+                    if (mealWord.length >= 3 &&
+                        (targetWord.contains(mealWord) || mealWord.contains(targetWord))) {
+                        Log.d(TAG, "Match por substring encontrado: '$targetWord' e '$mealWord'")
+                        return true
+                    }
+                }
+            }
+        }
+
+        Log.d(TAG, "Nenhum match encontrado")
+        return false
+    }
+
     private fun updateDietUI(meal: Meal) {
         Log.d(TAG, "Atualizando UI com refeição: ${meal.mealType}")
 
         mealTitle.text = meal.getMealTypeSafe()
-        weekdayText.text = meal.weekday ?: "Dia não especificado"
-
-        // Configurar ingredientes
         val comidas = meal.getComidasSafe()
         ingredientsText.text = if (comidas.isNotEmpty()) {
             comidas.joinToString("\n") { it.getFullDescription() }
         } else {
             "Nenhuma comida cadastrada"
         }
+        preparationText.text = meal.getComidasSafe().firstOrNull()?.name ?: "Instruções de preparo não disponíveis"
 
-
-        // Configurar imagem (se disponível)
         mealImage.visibility = View.GONE
-        noImageText.visibility = View.VISIBLE
-        noImageText.text = "Nenhuma imagem disponível para dieta"
-
-
+        videoLink.visibility = View.GONE
     }
 
     private fun updateNoDataUI(message: String) {
         Log.d(TAG, "Atualizando UI com mensagem de erro: $message")
+
         mealTitle.text = "Dados Indisponíveis"
         ingredientsText.text = message
         preparationText.text = "-"
-        weekdayText.text = "-"
         mealImage.visibility = View.GONE
-        noImageText.visibility = View.VISIBLE
-        noImageText.text = "Nenhuma imagem disponível"
         videoLink.visibility = View.GONE
     }
 }

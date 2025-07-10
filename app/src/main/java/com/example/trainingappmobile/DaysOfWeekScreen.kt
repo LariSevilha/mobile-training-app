@@ -13,7 +13,7 @@ class DaysOfWeekScreen : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_days_of_week)
 
-        // Recuperar o tipo de dados (TRAINING ou DIET)
+        // Recuperar o tipo de dados (TRAINING, DIET ou PDF)
         val dataType = intent.getStringExtra("DATA_TYPE") ?: "TRAINING"
         Log.d("DaysOfWeekScreen", "DATA_TYPE recebido: $dataType")
 
@@ -29,31 +29,25 @@ class DaysOfWeekScreen : ComponentActivity() {
 
         // Configurar cliques para cada dia
         mondayButton.setOnClickListener {
-            navigateToDayDetails("Segunda-feira", dataType)
+            navigateToDetails("Segunda-feira", dataType)
         }
-
         tuesdayButton.setOnClickListener {
-            navigateToDayDetails("Terça-feira", dataType)
+            navigateToDetails("Terça-feira", dataType)
         }
-
         wednesdayButton.setOnClickListener {
-            navigateToDayDetails("Quarta-feira", dataType)
+            navigateToDetails("Quarta-feira", dataType)
         }
-
         thursdayButton.setOnClickListener {
-            navigateToDayDetails("Quinta-feira", dataType)
+            navigateToDetails("Quinta-feira", dataType)
         }
-
         fridayButton.setOnClickListener {
-            navigateToDayDetails("Sexta-feira", dataType)
+            navigateToDetails("Sexta-feira", dataType)
         }
-
         saturdayButton.setOnClickListener {
-            navigateToDayDetails("Sábado", dataType)
+            navigateToDetails("Sábado", dataType)
         }
-
         sundayButton.setOnClickListener {
-            navigateToDayDetails("Domingo", dataType)
+            navigateToDetails("Domingo", dataType)
         }
 
         // Configurar clique no botão de voltar
@@ -63,16 +57,21 @@ class DaysOfWeekScreen : ComponentActivity() {
         }
     }
 
-    private fun navigateToDayDetails(dayOfWeek: String, dataType: String) {
-        Log.d("DaysOfWeekScreen", "Navegando para DayDetailsScreen - Dia: $dayOfWeek, Tipo: $dataType")
+    private fun navigateToDetails(dayOfWeek: String, dataType: String) {
+        Log.d("DaysOfWeekScreen", "Navegando para tela de detalhes - Dia: $dayOfWeek, Tipo: $dataType")
         try {
-            val intent = Intent(this, DayDetailsScreen::class.java)
+            val intent = when (dataType) {
+                "TRAINING" -> Intent(this, ExerciseDetailActivity::class.java)
+                "DIET" -> Intent(this, DietDetailActivity::class.java)
+                "PDF" -> Intent(this, PdfViewerScreen::class.java)
+                else -> Intent(this, ExerciseDetailActivity::class.java) // Fallback
+            }
             intent.putExtra("DAY_OF_WEEK", dayOfWeek)
             intent.putExtra("DATA_TYPE", dataType)
             startActivity(intent)
-            Log.d("DaysOfWeekScreen", "Intent iniciado com sucesso para DayDetailsScreen")
+            Log.d("DaysOfWeekScreen", "Intent iniciado com sucesso")
         } catch (e: Exception) {
-            Log.e("DaysOfWeekScreen", "Erro ao iniciar DayDetailsScreen: ${e.message}, stacktrace: ${e.stackTraceToString()}")
+            Log.e("DaysOfWeekScreen", "Erro ao iniciar tela de detalhes: ${e.message}", e)
             Toast.makeText(this, "Erro ao navegar: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }

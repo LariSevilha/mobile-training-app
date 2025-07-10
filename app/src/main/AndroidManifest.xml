@@ -26,8 +26,9 @@
         <activity android:name=".HomeScreen" />
         <activity android:name=".PdfViewerScreen" />
         <activity android:name=".PlanilhaScreen" />
-        <activity android:name=".DaysOfWeekScreen" /> <!-- Corrigido de DayOfWeekScreen para DaysOfWeekScreen -->
-        <activity android:name=".DayDetailsScreen" />   
+        <activity android:name=".DaysOfWeekScreen" />
+<!--        <activity android:name=".DayDetailsScreen" />-->
+        <activity android:name=".DietDetailActivity" />
         <activity android:name=".ExerciseDetailActivity" />
 
     </application>
