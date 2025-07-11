@@ -22,20 +22,21 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <!-- Series -->
+        <!-- Series and Repetitions -->
         <TextView
             android:id="@+id/series_text"
             style="@style/ExerciseCardText"
-            android:text="Séries: 0"
+            android:text="Séries: 0, Repetições: 0"
             android:layout_marginBottom="8dp"
             app:layout_constraintTop_toBottomOf="@id/exercise_name_text"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <!-- Repetitions -->
+        <!-- Repetitions (hidden for compatibility) -->
         <TextView
             android:id="@+id/repetitions_text"
             style="@style/ExerciseCardText"
             android:text="Repetições: 0"
+            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/series_text"
             app:layout_constraintStart_toStartOf="parent" />
 
