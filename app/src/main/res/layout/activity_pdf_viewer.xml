@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -12,6 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
+        android:layout_marginTop="25px"
         android:gravity="center_vertical"
         android:background="@color/background_black">
 
@@ -21,6 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginTop="25px"
             android:clickable="true"
             android:focusable="true"
             android:background="?android:attr/selectableItemBackground"
@@ -58,6 +61,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="25px"
+
                 android:text="Página "
                 android:textColor="@color/gold_primary"
                 android:textSize="14sp" />
@@ -67,6 +72,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1"
+                android:layout_marginTop="25px"
+
                 android:textColor="@color/gold_primary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -75,12 +82,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=" "
+                android:layout_marginTop="25px"
+
                 android:textColor="@color/gold_primary"
                 android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/total_pages_text"
                 android:layout_width="wrap_content"
+                android:layout_marginTop="25px"
                 android:layout_height="wrap_content"
                 android:text="de 0"
                 android:textColor="@color/gold_primary"
@@ -120,17 +130,6 @@
             android:indeterminateTint="@color/gold_primary"
             android:visibility="gone" />
 
-        <!-- Aviso de segurança -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:layout_marginBottom="16dp"
-            android:text="🔒 Conteúdo protegido - Screenshots bloqueados"
-            android:textColor="@color/gold_primary"
-            android:textSize="12sp"
-            android:alpha="0.7"
-            android:drawablePadding="4dp" />
 
     </FrameLayout>
 
