@@ -19,8 +19,6 @@ class ExerciseDetailActivity : ComponentActivity() {
     private lateinit var seriesCount: TextView
     private lateinit var repetitionsCount: TextView
     private lateinit var weekdayText: TextView
-    private lateinit var howToDoText: TextView
-    private lateinit var howToDoContainer: LinearLayout
     private lateinit var videoContainer: LinearLayout
     private lateinit var videoLink: LinearLayout
     private lateinit var backButton: LinearLayout
@@ -41,8 +39,6 @@ class ExerciseDetailActivity : ComponentActivity() {
             seriesCount = findViewById(R.id.series_count) ?: throw IllegalStateException("series_count not found")
             repetitionsCount = findViewById(R.id.repetitions_count) ?: throw IllegalStateException("repetitions_count not found")
             weekdayText = findViewById(R.id.weekday_text) ?: throw IllegalStateException("weekday_text not found")
-            howToDoText = findViewById(R.id.how_to_do_text) ?: throw IllegalStateException("how_to_do_text not found")
-            howToDoContainer = findViewById(R.id.how_to_do_container) ?: throw IllegalStateException("how_to_do_container not found")
             videoContainer = findViewById(R.id.video_container) ?: throw IllegalStateException("video_container not found")
             videoLink = findViewById(R.id.video_link) ?: throw IllegalStateException("video_link not found")
             backButton = findViewById(R.id.back_button_detail) ?: throw IllegalStateException("back_button_detail not found")
@@ -229,15 +225,6 @@ class ExerciseDetailActivity : ComponentActivity() {
         repetitionsCount.text = training.repeatAmount?.toString() ?: "0"
         weekdayText.text = training.weekday ?: "Dia não especificado"
 
-        // Handle description
-        if (training.description.isNullOrEmpty()) {
-            howToDoContainer.visibility = View.GONE
-            howToDoText.text = "Descrição não disponível"
-        } else {
-            howToDoText.text = training.description
-            howToDoContainer.visibility = View.VISIBLE
-        }
-
         // Handle video link
         if (!training.video.isNullOrEmpty()) {
             videoContainer.visibility = View.VISIBLE
@@ -263,8 +250,6 @@ class ExerciseDetailActivity : ComponentActivity() {
         seriesCount.text = "-"
         repetitionsCount.text = "-"
         weekdayText.text = "-"
-        howToDoText.text = message
-        howToDoContainer.visibility = View.VISIBLE
         videoContainer.visibility = View.GONE
     }
 

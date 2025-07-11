@@ -38,8 +38,6 @@ class DietDetailsScreen : ComponentActivity() {
             mealTitle = findViewById(R.id.meal_title)
             weekdayText = findViewById(R.id.weekday_text)
             ingredientsText = findViewById(R.id.ingredients_text)
-            preparationText = findViewById(R.id.preparation_text)
-            mealImage = findViewById(R.id.meal_image)
             noImageText = findViewById(R.id.no_image_text)
             videoLink = findViewById(R.id.video_link)
             backButton = findViewById(R.id.back_button_detail)

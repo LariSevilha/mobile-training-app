@@ -1,11 +1,7 @@
 package com.example.trainingappmobile
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -18,9 +14,6 @@ class DietDetailActivity : ComponentActivity() {
 
     private lateinit var mealTitle: TextView
     private lateinit var ingredientsText: TextView
-    private lateinit var preparationText: TextView
-    private lateinit var mealImage: ImageView
-    private lateinit var videoLink: TextView
     private lateinit var backButton: LinearLayout
 
     companion object {
@@ -30,36 +23,35 @@ class DietDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_diet_detail)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
 
-        // Inicializar views
+        // Initialize views
         try {
-            mealTitle = findViewById(R.id.meal_title)
-            ingredientsText = findViewById(R.id.ingredients_text)
-            preparationText = findViewById(R.id.preparation_text)
-            mealImage = findViewById(R.id.meal_image)
-            videoLink = findViewById(R.id.video_link)
-            backButton = findViewById(R.id.back_button_detail)
+            mealTitle = findViewById(R.id.meal_title) ?: throw IllegalStateException("meal_title not found")
+            ingredientsText = findViewById(R.id.ingredients_text) ?: throw IllegalStateException("ingredients_text not found")
+            backButton = findViewById(R.id.back_button_detail) ?: throw IllegalStateException("back_button_detail not found")
         } catch (e: Exception) {
-            Log.e(TAG, "Erro ao inicializar views: ${e.message}", e)
-            Toast.makeText(this, "Erro ao carregar a tela", Toast.LENGTH_SHORT).show()
+            Log.e(TAG, "Error initializing views: ${e.message}", e)
+            Toast.makeText(this, "Error loading screen: ${e.message}", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        // Configurar botão de voltar
+        // Set up back button
         backButton.setOnClickListener {
-            Log.d(TAG, "Botão Voltar clicado")
+            Log.d(TAG, "Back button clicked")
             finish()
+            overridePendingTransition(android.R.anim.fade_out, android.R.anim.fade_in)
         }
 
-        // Recuperar dados do Intent
+        // Retrieve day of week from Intent
         val dayOfWeek = intent.getStringExtra("DAY_OF_WEEK") ?: "Dia não especificado"
-        Log.d(TAG, "Dados recebidos - Dia: $dayOfWeek")
+        Log.d(TAG, "Received data - Day: $dayOfWeek")
 
-        // Configurar título inicial
+        // Set initial title
         mealTitle.text = "Dieta de $dayOfWeek"
 
-        // Carregar dados da dieta
+        // Load diet details
         loadDietDetails(dayOfWeek)
     }
 
@@ -67,56 +59,56 @@ class DietDetailActivity : ComponentActivity() {
         val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
         val apiKey = sharedPrefs.getString("auth_token", null)
         val deviceId = sharedPrefs.getString("device_id", null)
-        Log.d(TAG, "Credenciais: auth_token=$apiKey, deviceId=$deviceId")
+        Log.d(TAG, "Credentials: auth_token=$apiKey, deviceId=$deviceId")
 
         if (apiKey == null || deviceId == null) {
-            Log.e(TAG, "auth_token ou deviceId está nulo")
-            Toast.makeText(this, "Por favor, faça login novamente", Toast.LENGTH_SHORT).show()
+            Log.e(TAG, "auth_token or deviceId is null")
+            Toast.makeText(this, "Please log in again", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
         val authHeader = "Bearer $apiKey"
-        Log.d(TAG, "Carregando detalhes da dieta com authHeader=$authHeader, deviceId=$deviceId")
+        Log.d(TAG, "Loading diet details with authHeader=$authHeader, deviceId=$deviceId")
 
         RetrofitClient.apiService.getPlanilha(authHeader, deviceId).enqueue(object : Callback<PlanilhaResponse> {
             override fun onResponse(call: Call<PlanilhaResponse>, response: Response<PlanilhaResponse>) {
-                Log.d(TAG, "Resposta recebida: ${response.code()}")
+                Log.d(TAG, "API response received: ${response.code()}")
                 if (response.isSuccessful && response.body() != null) {
                     val planilha = response.body()!!
-                    Log.d(TAG, "Dados da planilha recebidos: $planilha")
+                    Log.d(TAG, "Planilha data received: $planilha")
 
                     if (planilha.hasError()) {
-                        Log.e(TAG, "Erro na resposta: ${planilha.error}")
+                        Log.e(TAG, "Error in response: ${planilha.error}")
                         Toast.makeText(this@DietDetailActivity, planilha.error, Toast.LENGTH_SHORT).show()
-                        updateNoDataUI("Erro ao carregar dados: ${planilha.error}")
+                        updateNoDataUI("Error loading data: ${planilha.error}")
                         return
                     }
 
                     handleDietData(planilha, dayOfWeek)
                 } else {
-                    Log.e(TAG, "Resposta não foi bem-sucedida: ${response.code()} - ${response.message()}")
+                    Log.e(TAG, "Response unsuccessful: ${response.code()} - ${response.message()}")
                     val errorBody = response.errorBody()?.string()
                     Log.e(TAG, "Error body: $errorBody")
-                    Toast.makeText(this@DietDetailActivity, "Erro ao carregar detalhes", Toast.LENGTH_SHORT).show()
-                    updateNoDataUI("Erro ao carregar dados")
+                    Toast.makeText(this@DietDetailActivity, "Error loading details", Toast.LENGTH_SHORT).show()
+                    updateNoDataUI("Error loading data")
                 }
             }
 
             override fun onFailure(call: Call<PlanilhaResponse>, t: Throwable) {
-                Log.e(TAG, "Falha na requisição: ${t.message}", t)
-                Toast.makeText(this@DietDetailActivity, "Falha na conexão: ${t.message}", Toast.LENGTH_SHORT).show()
-                updateNoDataUI("Falha na conexão")
+                Log.e(TAG, "Request failed: ${t.message}", t)
+                Toast.makeText(this@DietDetailActivity, "Connection failed: ${t.message}", Toast.LENGTH_SHORT).show()
+                updateNoDataUI("Connection failed")
             }
         })
     }
 
     private fun handleDietData(planilha: PlanilhaResponse, dayOfWeek: String) {
         val meals = planilha.getMealsSafe()
-        Log.d(TAG, "Total de refeições: ${meals.size}")
+        Log.d(TAG, "Total meals: ${meals.size}")
 
         meals.forEachIndexed { index, meal ->
-            Log.d(TAG, "Refeição $index: weekday='${meal.weekday}', type='${meal.mealType}'")
+            Log.d(TAG, "Meal $index: weekday='${meal.weekday}', type='${meal.mealType}'")
         }
 
         val matchingMeals = meals.filter { meal ->
@@ -125,26 +117,26 @@ class DietDetailActivity : ComponentActivity() {
             } ?: false
         }
 
-        Log.d(TAG, "Refeições encontradas para '$dayOfWeek': ${matchingMeals.size}")
+        Log.d(TAG, "Meals found for '$dayOfWeek': ${matchingMeals.size}")
 
         val meal = when {
             matchingMeals.isNotEmpty() -> {
-                Log.d(TAG, "Usando refeição específica para '$dayOfWeek'")
+                Log.d(TAG, "Using specific meal for '$dayOfWeek'")
                 matchingMeals.first()
             }
             meals.isNotEmpty() -> {
-                Log.w(TAG, "Nenhuma refeição específica encontrada para '$dayOfWeek'. Disponíveis: ${meals.map { it.weekday }}")
-                updateNoDataUI("Nenhuma refeição encontrada para $dayOfWeek")
+                Log.w(TAG, "No specific meal found for '$dayOfWeek'. Available: ${meals.map { it.weekday }}")
+                updateNoDataUI("No meal found for $dayOfWeek")
                 return
             }
             else -> {
-                Log.w(TAG, "Nenhuma refeição encontrada na planilha")
-                updateNoDataUI("Nenhuma refeição cadastrada")
+                Log.w(TAG, "No meal found in planilha")
+                updateNoDataUI("No meal registered")
                 return
             }
         }
 
-        Log.d(TAG, "Refeição selecionada: ${meal.mealType} para ${meal.weekday}")
+        Log.d(TAG, "Selected meal: ${meal.mealType} for ${meal.weekday}")
         updateDietUI(meal)
     }
 
@@ -168,7 +160,7 @@ class DietDetailActivity : ComponentActivity() {
         val normalizedTarget = normalizeDayName(targetDay)
         val normalizedMeal = normalizeDayName(mealDay)
 
-        Log.d(TAG, "Comparando dias: '$normalizedTarget' vs '$normalizedMeal'")
+        Log.d(TAG, "Comparing days: '$normalizedTarget' vs '$normalizedMeal'")
 
         val dayMappings = mapOf(
             "segunda" to listOf("segunda", "segunda-feira", "seg", "monday", "mon"),
@@ -181,13 +173,13 @@ class DietDetailActivity : ComponentActivity() {
         )
 
         if (normalizedTarget == normalizedMeal) {
-            Log.d(TAG, "Match exato encontrado")
+            Log.d(TAG, "Exact match found")
             return true
         }
 
         for ((key, variants) in dayMappings) {
             if (variants.contains(normalizedTarget) && variants.contains(normalizedMeal)) {
-                Log.d(TAG, "Match por mapeamento encontrado para $key")
+                Log.d(TAG, "Match found for $key")
                 return true
             }
         }
@@ -200,19 +192,19 @@ class DietDetailActivity : ComponentActivity() {
                 for (mealWord in mealWords) {
                     if (mealWord.length >= 3 &&
                         (targetWord.contains(mealWord) || mealWord.contains(targetWord))) {
-                        Log.d(TAG, "Match por substring encontrado: '$targetWord' e '$mealWord'")
+                        Log.d(TAG, "Substring match found: '$targetWord' and '$mealWord'")
                         return true
                     }
                 }
             }
         }
 
-        Log.d(TAG, "Nenhum match encontrado")
+        Log.d(TAG, "No match found")
         return false
     }
 
     private fun updateDietUI(meal: Meal) {
-        Log.d(TAG, "Atualizando UI com refeição: ${meal.mealType}")
+        Log.d(TAG, "Updating UI with meal: ${meal.mealType}")
 
         mealTitle.text = meal.getMealTypeSafe()
         val comidas = meal.getComidasSafe()
@@ -221,19 +213,37 @@ class DietDetailActivity : ComponentActivity() {
         } else {
             "Nenhuma comida cadastrada"
         }
-        preparationText.text = meal.getComidasSafe().firstOrNull()?.name ?: "Instruções de preparo não disponíveis"
-
-        mealImage.visibility = View.GONE
-        videoLink.visibility = View.GONE
     }
 
     private fun updateNoDataUI(message: String) {
-        Log.d(TAG, "Atualizando UI com mensagem de erro: $message")
+        Log.d(TAG, "Updating UI with error message: $message")
 
         mealTitle.text = "Dados Indisponíveis"
         ingredientsText.text = message
-        preparationText.text = "-"
-        mealImage.visibility = View.GONE
-        videoLink.visibility = View.GONE
+    }
+
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(android.R.anim.fade_out, android.R.anim.fade_in)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop called")
     }
 }

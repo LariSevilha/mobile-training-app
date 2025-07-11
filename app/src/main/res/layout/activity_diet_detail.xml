@@ -71,45 +71,6 @@
                 android:padding="12dp" />
         </LinearLayout>
 
-        <!-- Imagem da Refeição -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/input_background"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="IMAGEM DA REFEIÇÃO"
-                android:textColor="@color/gold_primary"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif-medium"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <ImageView
-                android:id="@+id/meal_image"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:contentDescription="Imagem da refeição"
-                android:scaleType="centerInside"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/no_image_text"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:text="Nenhuma imagem disponível"
-                android:textColor="@color/text_secondary"
-                android:textSize="14sp"
-                android:gravity="center"
-                android:background="@drawable/input_background"
-                android:visibility="visible" />
-        </LinearLayout>
-
         <!-- Ingredientes -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -140,85 +101,18 @@
                 android:lineSpacingExtra="4dp" />
         </LinearLayout>
 
-        <!-- Modo de Preparo -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/input_background"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:id="@+id/preparation_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="MODO DE PREPARO"
-                android:textColor="@color/gold_primary"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif-medium"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:id="@+id/preparation_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Instruções detalhadas de preparo."
-                android:textColor="@color/text_primary"
-                android:textSize="14sp"
-                android:lineSpacingExtra="4dp" />
-        </LinearLayout>
-
-        <!-- Vídeo -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/input_background"
-            android:padding="16dp"
-            android:layout_marginBottom="24dp"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="VÍDEO DE PREPARO"
-                android:textColor="@color/gold_primary"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif-medium"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:id="@+id/video_link"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="▶ Assistir Vídeo"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:fontFamily="sans-serif-medium"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:background="@drawable/back_button_style"
-                android:padding="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground" />
-        </LinearLayout>
-
         <!-- Botão Voltar -->
         <LinearLayout
             android:id="@+id/back_button_detail"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:background="@drawable/back_button_style"
-            android:padding="16dp"
             android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginBottom="24dp"
+            android:elevation="4dp"
             android:clickable="true"
-            android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:layout_marginBottom="24dp">
+            android:focusable="true">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -228,6 +122,7 @@
                 android:textSize="16sp"
                 android:fontFamily="sans-serif-medium"
                 android:textStyle="bold" />
+
         </LinearLayout>
 
         <!-- Divisor -->
