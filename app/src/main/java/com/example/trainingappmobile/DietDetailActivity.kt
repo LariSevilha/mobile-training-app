@@ -16,7 +16,6 @@ class DietDetailActivity : ComponentActivity() {
     private lateinit var weekdayText: TextView
     private lateinit var mealsContainer: LinearLayout
     private lateinit var backButton: LinearLayout
-    private lateinit var mealTitle: TextView
 
     companion object {
         private const val TAG = "DietDetailActivity"
@@ -124,10 +123,10 @@ class DietDetailActivity : ComponentActivity() {
         when {
             matchingMeals.isNotEmpty() -> {
                 Log.d(TAG, "Displaying ${matchingMeals.size} meals for '$dayOfWeek'")
-                updateDietUI(matchingMeals)
+                updateDietUI(matchingMeals, dayOfWeek)
             }
             meals.isNotEmpty() -> {
-                Log.w(TAG, "No specific meal found for '$dayOfWeek'. Available: ${meals.map { it.weekday }}")
+                Log.w(TAG, "No specific meal found for '$dayOfWeek'. Available weekdays: ${meals.map { it.weekday }}")
                 updateNoDataUI("No meal found for $dayOfWeek")
             }
             else -> {
@@ -150,7 +149,21 @@ class DietDetailActivity : ComponentActivity() {
             .replace("ú", "u")
             .replace("ü", "u")
             .replace("-feira", "")
+            .replace(" ", "")
             .trim()
+    }
+
+    private fun getPortugueseDayName(normalizedDay: String): String {
+        val dayMappings = mapOf(
+            "segunda" to "Segunda-feira",
+            "terca" to "Terça-feira",
+            "quarta" to "Quarta-feira",
+            "quinta" to "Quinta-feira",
+            "sexta" to "Sexta-feira",
+            "sabado" to "Sábado",
+            "domingo" to "Domingo"
+        )
+        return dayMappings[normalizedDay] ?: normalizedDay.replaceFirstChar { it.uppercaseChar() }
     }
 
     private fun isDayMatch(targetDay: String, mealDay: String): Boolean {
@@ -160,38 +173,35 @@ class DietDetailActivity : ComponentActivity() {
         Log.d(TAG, "Comparing days: '$normalizedTarget' vs '$normalizedMeal'")
 
         val dayMappings = mapOf(
-            "segunda" to listOf("segunda", "segunda-feira", "seg", "monday", "mon"),
-            "terca" to listOf("terça", "terça-feira", "ter", "tuesday", "tue"),
-            "quarta" to listOf("quarta", "quarta-feira", "qua", "wednesday", "wed"),
-            "quinta" to listOf("quinta", "quinta-feira", "qui", "thursday", "thu"),
-            "sexta" to listOf("sexta", "sexta-feira", "sex", "friday", "fri"),
-            "sabado" to listOf("sábado", "sabado", "sab", "saturday", "sat"),
-            "domingo" to listOf("domingo", "dom", "sunday", "sun")
+            "segunda" to listOf("segunda", "segunda-feira", "seg", "monday", "mon", "segundafeira"),
+            "terca" to listOf("terça", "terça-feira", "ter", "tuesday", "tue", "tercafeira", "terçafeira"),
+            "quarta" to listOf("quarta", "quarta-feira", "qua", "wednesday", "wed", "quartafeira"),
+            "quinta" to listOf("quinta", "quinta-feira", "qui", "thursday", "thu", "quintafeira"),
+            "sexta" to listOf("sexta", "sexta-feira", "sex", "friday", "fri", "sextafeira"),
+            "sabado" to listOf("sábado", "sabado", "sab", "saturday", "sat", "sabadofeira", "sábadofeira"),
+            "domingo" to listOf("domingo", "dom", "sunday", "sun", "domingofeira")
         )
 
-        if (normalizedTarget == normalizedMeal) {
-            Log.d(TAG, "Exact match found")
-            return true
+        val targetVariants = dayMappings.entries.find { it.value.contains(normalizedTarget) }?.value ?: emptyList()
+        val match = targetVariants.contains(normalizedMeal)
+
+        if (match) {
+            Log.d(TAG, "Match found for '$normalizedTarget' in variants: $targetVariants")
+        } else {
+            Log.w(TAG, "No match for '$normalizedTarget' vs '$normalizedMeal'. Target variants: $targetVariants")
         }
 
-        for ((key, variants) in dayMappings) {
-            if (variants.contains(normalizedTarget) && variants.contains(normalizedMeal)) {
-                Log.d(TAG, "Match found for $key")
-                return true
-            }
-        }
-
-        return false
+        return match
     }
 
-    private fun updateDietUI(meals: List<Meal>) {
+    private fun updateDietUI(meals: List<Meal>, dayOfWeek: String) {
         Log.d(TAG, "Updating UI with ${meals.size} meals")
 
         // Clear existing views in the container
         mealsContainer.removeAllViews()
 
-        // Set weekday from the first meal
-        weekdayText.text = meals.firstOrNull()?.weekday ?: "Dia não especificado"
+        // Set weekday to the intent's DAY_OF_WEEK (already in Portuguese)
+        weekdayText.text = dayOfWeek
 
         if (meals.isEmpty()) {
             updateNoDataUI("Nenhuma refeição cadastrada")

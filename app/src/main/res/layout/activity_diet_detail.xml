@@ -20,11 +20,12 @@
 
             <ImageView
                 android:id="@+id/logo_image"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:src="@drawable/logo"
                 android:contentDescription="Logo do aplicativo"
                 android:adjustViewBounds="true"
+                android:layout_marginTop="20dp"
                 android:layout_weight="0" />
 
             <TextView
@@ -32,6 +33,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginTop="20dp"
                 android:text="Dia da semana"
                 android:textColor="@color/gold_primary"
                 android:textSize="22sp"
