@@ -74,7 +74,7 @@ data class Comida(
     @SerializedName("name") val name: String? = null,
     @SerializedName("amount") val amount: String? = null
 ) {
-    fun getFullDescription(): String = "${name ?: "Comida não definida"} - ${amount ?: "0"}g"
+    fun getFullDescription(): String = "${name ?: "Comida não definida"} -   ${amount ?: "0"}g"
 }
 
 data class WeeklyPdf(

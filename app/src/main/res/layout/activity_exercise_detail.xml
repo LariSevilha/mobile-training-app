@@ -23,16 +23,18 @@
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:src="@drawable/logo"
+                android:layout_marginTop="20dp"
                 android:contentDescription="Logo do aplicativo"
                 android:adjustViewBounds="true"
                 android:layout_weight="0" />
 
             <TextView
-                android:id="@+id/exercise_title"
+                android:id="@+id/weekday_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Nome do Exercício"
+                android:layout_marginTop="20dp"
+                android:text="Dia da semana"
                 android:textColor="@color/gold_primary"
                 android:textSize="22sp"
                 android:fontFamily="sans-serif-medium"
@@ -140,7 +142,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="DIA DA SEMANA"
+                android:text="Exercicio"
                 android:textColor="@color/gold_primary"
                 android:textSize="12sp"
                 android:fontFamily="sans-serif-medium"
@@ -148,87 +150,15 @@
                 android:layout_marginBottom="4dp" />
 
             <TextView
-                android:id="@+id/weekday_text"
+                android:id="@+id/exercise_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Segunda-feira"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:fontFamily="sans-serif-medium"
                 android:background="@drawable/input_background"
                 android:padding="12dp"
                 android:layout_marginBottom="16dp" />
-
-        </LinearLayout>
-
-        <!-- Imagem do Exercício -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/input_background"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="DEMONSTRAÇÃO"
-                android:textColor="@color/gold_primary"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif-medium"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <ImageView
-                android:id="@+id/exercise_image"
-                android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:contentDescription="Ilustração do exercício"
-                android:scaleType="centerCrop"
-                android:background="@drawable/input_background"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/no_image_text"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:text="Nenhuma imagem disponível"
-                android:textColor="@color/text_secondary"
-                android:textSize="14sp"
-                android:gravity="center"
-                android:background="@drawable/input_background"
-                android:visibility="visible" />
-
-        </LinearLayout>
-
-        <!-- Instruções -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/input_background"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="COMO EXECUTAR"
-                android:textColor="@color/gold_primary"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif-medium"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:id="@+id/how_to_do_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Instruções detalhadas de como executar o exercício."
-                android:textColor="@color/text_primary"
-                android:textSize="14sp"
-                android:lineSpacingExtra="4dp" />
 
         </LinearLayout>
 
@@ -292,6 +222,7 @@
             android:elevation="4dp"
             android:clickable="true"
             android:focusable="true">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -300,6 +231,7 @@
                 android:textSize="16sp"
                 android:fontFamily="sans-serif-medium"
                 android:textStyle="bold" />
+
         </LinearLayout>
 
         <!-- Divisor -->
@@ -323,5 +255,3 @@
 
     </LinearLayout>
 </ScrollView>
-
-

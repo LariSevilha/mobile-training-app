@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -15,14 +16,9 @@ import retrofit2.Response
 
 class ExerciseDetailActivity : ComponentActivity() {
 
-    private lateinit var exerciseTitle: TextView
-    private lateinit var seriesCount: TextView
-    private lateinit var repetitionsCount: TextView
     private lateinit var weekdayText: TextView
-    private lateinit var videoContainer: LinearLayout
-    private lateinit var videoLink: LinearLayout
+    private lateinit var exercisesContainer: LinearLayout
     private lateinit var backButton: LinearLayout
-    private var currentTraining: Training? = null
 
     companion object {
         private const val TAG = "ExerciseDetailActivity"
@@ -35,93 +31,101 @@ class ExerciseDetailActivity : ComponentActivity() {
 
         // Initialize views
         try {
-            exerciseTitle = findViewById(R.id.exercise_title) ?: throw IllegalStateException("exercise_title not found")
-            seriesCount = findViewById(R.id.series_count) ?: throw IllegalStateException("series_count not found")
-            repetitionsCount = findViewById(R.id.repetitions_count) ?: throw IllegalStateException("repetitions_count not found")
             weekdayText = findViewById(R.id.weekday_text) ?: throw IllegalStateException("weekday_text not found")
-            videoContainer = findViewById(R.id.video_container) ?: throw IllegalStateException("video_container not found")
-            videoLink = findViewById(R.id.video_link) ?: throw IllegalStateException("video_link not found")
+            exercisesContainer = findViewById(R.id.exercises_container) ?: throw IllegalStateException("exercises_container not found")
             backButton = findViewById(R.id.back_button_detail) ?: throw IllegalStateException("back_button_detail not found")
         } catch (e: Exception) {
             Log.e(TAG, "Error initializing views: ${e.message}", e)
-            Toast.makeText(this, "Error loading screen: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Erro ao carregar a tela", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
         // Set up back button
         backButton.setOnClickListener {
-            Log.d(TAG, "Back button clicked")
+            Log.d(TAG, "Botão Voltar clicado")
             finish()
             overridePendingTransition(android.R.anim.fade_out, android.R.anim.fade_in)
         }
 
         // Retrieve day of week from Intent
         val dayOfWeek = intent.getStringExtra("DAY_OF_WEEK") ?: "Dia não especificado"
-        Log.d(TAG, "Received data - Day: $dayOfWeek")
+        Log.d(TAG, "Dia recebido: $dayOfWeek")
 
-        // Set initial title
-        exerciseTitle.text = "Treino de $dayOfWeek"
-        weekdayText.text = dayOfWeek
+        // Set initial weekday in Portuguese
+        weekdayText.text = translateDayToPortuguese(dayOfWeek)
 
         // Load training details
         loadTrainingDetails(dayOfWeek)
+    }
+
+    private fun translateDayToPortuguese(day: String): String {
+        return when (day.lowercase().trim()) {
+            "monday", "mon", "segunda", "segunda-feira", "seg", "segundafeira" -> "Segunda-feira"
+            "tuesday", "tue", "terça", "terça-feira", "ter", "tercafeira", "terçafeira" -> "Terça-feira"
+            "wednesday", "wed", "quarta", "quarta-feira", "qua", "quartafeira" -> "Quarta-feira"
+            "thursday", "thu", "quinta", "quinta-feira", "qui", "quintafeira" -> "Quinta-feira"
+            "friday", "fri", "sexta", "sexta-feira", "sex", "sextafeira" -> "Sexta-feira"
+            "saturday", "sat", "sábado", "sabado", "sab", "sabadofeira", "sábadofeira" -> "Sábado"
+            "sunday", "sun", "domingo", "dom", "domingofeira" -> "Domingo"
+            else -> day.replaceFirstChar { it.uppercaseChar() }
+        }
     }
 
     private fun loadTrainingDetails(dayOfWeek: String) {
         val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
         val apiKey = sharedPrefs.getString("auth_token", null)
         val deviceId = sharedPrefs.getString("device_id", null)
-        Log.d(TAG, "Credentials: auth_token=$apiKey, deviceId=$deviceId")
+        Log.d(TAG, "Credenciais: auth_token=$apiKey, deviceId=$deviceId")
 
         if (apiKey == null || deviceId == null) {
-            Log.e(TAG, "auth_token or deviceId is null")
-            Toast.makeText(this, "Please log in again", Toast.LENGTH_SHORT).show()
+            Log.e(TAG, "auth_token ou deviceId está nulo")
+            Toast.makeText(this, "Por favor, faça login novamente", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
         val authHeader = "Bearer $apiKey"
-        Log.d(TAG, "Loading training details with authHeader=$authHeader, deviceId=$deviceId")
+        Log.d(TAG, "Carregando detalhes do treino com authHeader=$authHeader, deviceId=$deviceId")
 
         RetrofitClient.apiService.getPlanilha(authHeader, deviceId).enqueue(object : Callback<PlanilhaResponse> {
             override fun onResponse(call: Call<PlanilhaResponse>, response: Response<PlanilhaResponse>) {
-                Log.d(TAG, "API response received: ${response.code()}")
+                Log.d(TAG, "Resposta recebida: ${response.code()}")
                 if (response.isSuccessful && response.body() != null) {
                     val planilha = response.body()!!
-                    Log.d(TAG, "Planilha data received: $planilha")
+                    Log.d(TAG, "Dados da planilha recebidos: $planilha")
 
                     if (planilha.hasError()) {
-                        Log.e(TAG, "Error in response: ${planilha.error}")
+                        Log.e(TAG, "Erro na resposta: ${planilha.error}")
                         Toast.makeText(this@ExerciseDetailActivity, planilha.error, Toast.LENGTH_SHORT).show()
-                        updateNoDataUI("Error loading data: ${planilha.error}")
+                        updateNoDataUI("Erro ao carregar dados: ${planilha.error}")
                         return
                     }
 
                     handleTrainingData(planilha, dayOfWeek)
                 } else {
-                    Log.e(TAG, "Response unsuccessful: ${response.code()} - ${response.message()}")
+                    Log.e(TAG, "Resposta não foi bem-sucedida: ${response.code()} - ${response.message()}")
                     val errorBody = response.errorBody()?.string()
-                    Log.e(TAG, "Error body: $errorBody")
-                    Toast.makeText(this@ExerciseDetailActivity, "Error loading details", Toast.LENGTH_SHORT).show()
-                    updateNoDataUI("Error loading data")
+                    Log.e(TAG, "Corpo do erro: $errorBody")
+                    Toast.makeText(this@ExerciseDetailActivity, "Erro ao carregar detalhes", Toast.LENGTH_SHORT).show()
+                    updateNoDataUI("Erro ao carregar dados")
                 }
             }
 
             override fun onFailure(call: Call<PlanilhaResponse>, t: Throwable) {
-                Log.e(TAG, "Request failed: ${t.message}", t)
-                Toast.makeText(this@ExerciseDetailActivity, "Connection failed: ${t.message}", Toast.LENGTH_SHORT).show()
-                updateNoDataUI("Connection failed")
+                Log.e(TAG, "Falha na requisição: ${t.message}", t)
+                Toast.makeText(this@ExerciseDetailActivity, "Falha na conexão: ${t.message}", Toast.LENGTH_SHORT).show()
+                updateNoDataUI("Falha na conexão")
             }
         })
     }
 
     private fun handleTrainingData(planilha: PlanilhaResponse, dayOfWeek: String) {
         val trainings = planilha.getTrainingsSafe()
-        Log.d(TAG, "Total trainings: ${trainings.size}")
+        Log.d(TAG, "Total de treinos: ${trainings.size}")
 
         trainings.forEachIndexed { index, training ->
-            Log.d(TAG, "Training $index: weekday='${training.weekday}', exerciseName='${training.exerciseName}'")
+            Log.d(TAG, "Treino $index: weekday='${training.weekday}', exerciseName='${training.exerciseName}', video='${training.video}', photoUrls='${training.photoUrls}'")
         }
 
         val matchingTrainings = trainings.filter { training ->
@@ -130,28 +134,22 @@ class ExerciseDetailActivity : ComponentActivity() {
             } ?: false
         }
 
-        Log.d(TAG, "Trainings found for '$dayOfWeek': ${matchingTrainings.size}")
+        Log.d(TAG, "Treinos encontrados para '$dayOfWeek': ${matchingTrainings.size}")
 
-        val training = when {
+        when {
             matchingTrainings.isNotEmpty() -> {
-                Log.d(TAG, "Using specific training for '$dayOfWeek'")
-                matchingTrainings.first()
+                Log.d(TAG, "Exibindo ${matchingTrainings.size} treinos para '$dayOfWeek'")
+                updateTrainingUI(matchingTrainings, dayOfWeek)
             }
             trainings.isNotEmpty() -> {
-                Log.w(TAG, "No specific training found for '$dayOfWeek'. Available: ${trainings.map { it.weekday }}")
-                updateNoDataUI("No training found for $dayOfWeek")
-                return
+                Log.w(TAG, "Nenhum treino específico encontrado para '$dayOfWeek'. Disponíveis: ${trainings.map { it.weekday }}")
+                updateNoDataUI("Nenhum treino encontrado para ${translateDayToPortuguese(dayOfWeek)}")
             }
             else -> {
-                Log.w(TAG, "No training found in planilha")
-                updateNoDataUI("No training registered")
-                return
+                Log.w(TAG, "Nenhum treino encontrado na planilha")
+                updateNoDataUI("Nenhum treino cadastrado")
             }
         }
-
-        currentTraining = training
-        Log.d(TAG, "Selected training: ${training.exerciseName} for ${training.weekday}")
-        updateTrainingUI(training)
     }
 
     private fun normalizeDayName(day: String): String {
@@ -167,6 +165,7 @@ class ExerciseDetailActivity : ComponentActivity() {
             .replace("ú", "u")
             .replace("ü", "u")
             .replace("-feira", "")
+            .replace(" ", "")
             .trim()
     }
 
@@ -174,83 +173,118 @@ class ExerciseDetailActivity : ComponentActivity() {
         val normalizedTarget = normalizeDayName(targetDay)
         val normalizedTraining = normalizeDayName(trainingDay)
 
-        Log.d(TAG, "Comparing days: '$normalizedTarget' vs '$normalizedTraining'")
+        Log.d(TAG, "Comparando dias: '$normalizedTarget' vs '$normalizedTraining'")
 
         val dayMappings = mapOf(
-            "segunda" to listOf("segunda", "segunda-feira", "seg", "monday", "mon"),
-            "terça" to listOf("terça", "terça-feira", "ter", "tuesday", "tue"),
-            "quarta" to listOf("quarta", "quarta-feira", "qua", "wednesday", "wed"),
-            "quinta" to listOf("quinta", "quinta-feira", "qui", "thursday", "thu"),
-            "sexta" to listOf("sexta", "sexta-feira", "sex", "friday", "fri"),
-            "sábado" to listOf("sábado", "sabado", "sab", "saturday", "sat"),
-            "domingo" to listOf("domingo", "dom", "sunday", "sun")
+            "segunda" to listOf("segunda", "segunda-feira", "seg", "monday", "mon", "segundafeira"),
+            "terca" to listOf("terça", "terça-feira", "ter", "tuesday", "tue", "tercafeira", "terçafeira"),
+            "quarta" to listOf("quarta", "quarta-feira", "qua", "wednesday", "wed", "quartafeira"),
+            "quinta" to listOf("quinta", "quinta-feira", "qui", "thursday", "thu", "quintafeira"),
+            "sexta" to listOf("sexta", "sexta-feira", "sex", "friday", "fri", "sextafeira"),
+            "sabado" to listOf("sábado", "sabado", "sab", "saturday", "sat", "sabadofeira", "sábadofeira"),
+            "domingo" to listOf("domingo", "dom", "sunday", "sun", "domingofeira")
         )
 
-        if (normalizedTarget == normalizedTraining) {
-            Log.d(TAG, "Exact match found")
-            return true
+        val targetVariants = dayMappings.entries.find { it.value.contains(normalizedTarget) }?.value ?: emptyList()
+        val match = targetVariants.contains(normalizedTraining)
+
+        if (match) {
+            Log.d(TAG, "Correspondência encontrada para '$normalizedTarget' em variantes: $targetVariants")
+        } else {
+            Log.w(TAG, "Nenhuma correspondência para '$normalizedTarget' vs '$normalizedTraining'. Variantes alvo: $targetVariants")
         }
 
-        for ((key, variants) in dayMappings) {
-            if (variants.contains(normalizedTarget) && variants.contains(normalizedTraining)) {
-                Log.d(TAG, "Match found for $key")
-                return true
-            }
-        }
-
-        val targetWords = normalizedTarget.split(" ", "-")
-        val mealWords = normalizedTraining.split(" ", "-")
-
-        for (targetWord in targetWords) {
-            if (targetWord.length >= 3) {
-                for (mealWord in mealWords) {
-                    if (mealWord.length >= 3 &&
-                        (targetWord.contains(mealWord) || mealWord.contains(targetWord))) {
-                        Log.d(TAG, "Substring match found: '$targetWord' and '$mealWord'")
-                        return true
-                    }
-                }
-            }
-        }
-
-        Log.d(TAG, "No match found")
-        return false
+        return match
     }
 
-    private fun updateTrainingUI(training: Training) {
-        Log.d(TAG, "Updating UI with training: ${training.exerciseName}")
+    private fun updateTrainingUI(trainings: List<Training>, dayOfWeek: String) {
+        Log.d(TAG, "Atualizando UI com ${trainings.size} treinos para '$dayOfWeek'")
 
-        exerciseTitle.text = training.exerciseName ?: "Nome não disponível"
-        seriesCount.text = training.serieAmount?.toString() ?: "0"
-        repetitionsCount.text = training.repeatAmount?.toString() ?: "0"
-        weekdayText.text = training.weekday ?: "Dia não especificado"
+        // Clear existing views in the container
+        exercisesContainer.removeAllViews()
 
-        // Handle video link
-        if (!training.video.isNullOrEmpty()) {
-            videoContainer.visibility = View.VISIBLE
-            videoLink.setOnClickListener {
-                try {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(training.video))
-                    startActivity(intent)
-                    Log.d(TAG, "Opening video: ${training.video}")
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error opening video: ${e.message}", e)
-                    Toast.makeText(this, "Não foi possível abrir o vídeo", Toast.LENGTH_SHORT).show()
+        // Set weekday in Portuguese
+        weekdayText.text = translateDayToPortuguese(dayOfWeek)
+
+        if (trainings.isEmpty()) {
+            updateNoDataUI("Nenhum treino cadastrado")
+            return
+        }
+
+        // Add a card for each training
+        trainings.forEach { training ->
+            // Inflate a new card layout
+            val cardView = LayoutInflater.from(this).inflate(R.layout.exercise_card, null)
+
+            // Find views in the card
+            val exerciseNameText = cardView.findViewById<TextView>(R.id.exercise_name_text)
+            val seriesText = cardView.findViewById<TextView>(R.id.series_text)
+            val repetitionsText = cardView.findViewById<TextView>(R.id.repetitions_text)
+            val noVideoText = cardView.findViewById<TextView>(R.id.no_video_text)
+            val videoLinkContainer = cardView.findViewById<LinearLayout>(R.id.video_link_container)
+            val videoLinkText = cardView.findViewById<TextView>(R.id.video_link_text)
+
+            // Set training data
+            exerciseNameText.text = training.getExerciseNameSafe()
+            seriesText.text = training.getSeriesRepetitionsText()
+
+            // Handle video link
+            Log.d(TAG, "Processando vídeo para ${training.getExerciseNameSafe()}: '${training.video}'")
+            if (training.hasVideo()) {
+                videoLinkContainer.visibility = View.VISIBLE
+                noVideoText.visibility = View.GONE
+                videoLinkText.setOnClickListener {
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(training.video))
+                        startActivity(intent)
+                        Log.d(TAG, "Abrindo vídeo: ${training.video}")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Erro ao abrir vídeo: ${e.message}", e)
+                        Toast.makeText(this, "Não foi possível abrir o vídeo: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
                 }
+            } else {
+                videoLinkContainer.visibility = View.GONE
+                noVideoText.visibility = View.VISIBLE
+                Log.w(TAG, "Vídeo não disponível para ${training.getExerciseNameSafe()}: '${training.video}'")
             }
-        } else {
-            videoContainer.visibility = View.GONE
+
+            // Add card to container
+            val layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            layoutParams.bottomMargin = (16 * resources.displayMetrics.density).toInt() // Convert 16dp to pixels
+            exercisesContainer.addView(cardView, layoutParams)
+
+            Log.d(TAG, "Card adicionado para treino: ${training.getExerciseNameSafe()}")
         }
     }
 
     private fun updateNoDataUI(message: String) {
-        Log.d(TAG, "Updating UI with error message: $message")
+        Log.d(TAG, "Atualizando UI com mensagem de erro: $message")
 
-        exerciseTitle.text = "Dados Indisponíveis"
-        seriesCount.text = "-"
-        repetitionsCount.text = "-"
+        exercisesContainer.removeAllViews()
+        val errorView = LayoutInflater.from(this).inflate(R.layout.exercise_card, null)
+        val exerciseNameText = errorView.findViewById<TextView>(R.id.exercise_name_text)
+        val seriesText = errorView.findViewById<TextView>(R.id.series_text)
+        val repetitionsText = errorView.findViewById<TextView>(R.id.repetitions_text)
+        val noVideoText = errorView.findViewById<TextView>(R.id.no_video_text)
+        val videoLinkContainer = errorView.findViewById<LinearLayout>(R.id.video_link_container)
+
+        exerciseNameText.text = "Dados Indisponíveis"
+        seriesText.text = message
+        repetitionsText.text = ""
+        noVideoText.visibility = View.VISIBLE
+        videoLinkContainer.visibility = View.GONE
         weekdayText.text = "-"
-        videoContainer.visibility = View.GONE
+
+        val layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        layoutParams.bottomMargin = (16 * resources.displayMetrics.density).toInt()
+        exercisesContainer.addView(errorView, layoutParams)
     }
 
     override fun finish() {
@@ -260,21 +294,21 @@ class ExerciseDetailActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        Log.d(TAG, "onStart called")
+        Log.d(TAG, "onStart chamado")
     }
 
     override fun onResume() {
         super.onResume()
-        Log.d(TAG, "onResume called")
+        Log.d(TAG, "onResume chamado")
     }
 
     override fun onPause() {
         super.onPause()
-        Log.d(TAG, "onPause called")
+        Log.d(TAG, "onPause chamado")
     }
 
     override fun onStop() {
         super.onStop()
-        Log.d(TAG, "onStop called")
+        Log.d(TAG, "onStop chamado")
     }
 }

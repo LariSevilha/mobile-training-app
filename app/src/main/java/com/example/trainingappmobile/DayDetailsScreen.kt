@@ -38,7 +38,6 @@ class DietDetailsScreen : ComponentActivity() {
             mealTitle = findViewById(R.id.title_text)
             weekdayText = findViewById(R.id.weekday_text)
             ingredientsText = findViewById(R.id.ingredients_text)
-            noImageText = findViewById(R.id.no_image_text)
             videoLink = findViewById(R.id.video_link)
             backButton = findViewById(R.id.back_button_detail)
         } catch (e: Exception) {

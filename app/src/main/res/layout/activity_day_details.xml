@@ -16,7 +16,9 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="24dp">
+            android:layout_marginBottom="24dp"
+            android:layout_marginTop="24dp">
+
 
             <ImageView
                 android:id="@+id/logo_image"
@@ -28,186 +30,26 @@
                 android:layout_weight="0" />
 
             <TextView
-                android:id="@+id/exercise_title"
+                android:id="@+id/weekday_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Nome do Exercício"
+                android:text="Dia da semana"
                 android:textColor="@color/gold_primary"
                 android:textSize="22sp"
                 android:fontFamily="sans-serif-medium"
                 android:textStyle="bold"
                 android:gravity="center"
                 android:layout_marginStart="16dp" />
-
         </LinearLayout>
 
-        <!-- Card com Informações do Exercício -->
+        <!-- Container para os cards de exercícios -->
         <LinearLayout
+            android:id="@+id/exercises_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/input_background"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
-
-            <!-- Seção Séries e Repetições -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="INFORMAÇÕES DO TREINO"
-                android:textColor="@color/gold_primary"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif-medium"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:background="@drawable/input_background"
-                    android:padding="12dp"
-                    android:layout_marginEnd="8dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="SÉRIES"
-                        android:textColor="@color/gold_primary"
-                        android:textSize="12sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold"
-                        android:gravity="center" />
-
-                    <TextView
-                        android:id="@+id/series_count"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="3"
-                        android:textColor="@color/text_primary"
-                        android:textSize="18sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:layout_marginTop="4dp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:background="@drawable/input_background"
-                    android:padding="12dp"
-                    android:layout_marginStart="8dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="REPETIÇÕES"
-                        android:textColor="@color/gold_primary"
-                        android:textSize="12sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold"
-                        android:gravity="center" />
-
-                    <TextView
-                        android:id="@+id/repetitions_count"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="12"
-                        android:textColor="@color/text_primary"
-                        android:textSize="18sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:layout_marginTop="4dp" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- Dia da Semana -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="DIA DA SEMANA"
-                android:textColor="@color/gold_primary"
-                android:textSize="12sp"
-                android:fontFamily="sans-serif-medium"
-                android:textStyle="bold"
-                android:layout_marginBottom="4dp" />
-
-            <TextView
-                android:id="@+id/weekday_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Segunda-feira"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:fontFamily="sans-serif-medium"
-                android:background="@drawable/input_background"
-                android:padding="12dp"
-                android:layout_marginBottom="16dp" />
-
-        </LinearLayout>
-
-        <!-- Vídeo -->
-        <LinearLayout
-            android:id="@+id/video_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/input_background"
-            android:padding="16dp"
-            android:layout_marginBottom="24dp"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="VÍDEO DEMONSTRATIVO"
-                android:textColor="@color/gold_primary"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif-medium"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <LinearLayout
-                android:id="@+id/video_link"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/back_button_style"
-                android:padding="16dp"
-                android:gravity="center"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="▶ Assistir Vídeo Demonstrativo"
-                    android:textColor="@color/button_black"
-                    android:textSize="16sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="bold"
-                    android:gravity="center" />
-
-            </LinearLayout>
-
-        </LinearLayout>
+            android:layout_marginBottom="16dp" />
 
         <!-- Botão Voltar -->
         <LinearLayout
@@ -230,7 +72,6 @@
                 android:textSize="16sp"
                 android:fontFamily="sans-serif-medium"
                 android:textStyle="bold" />
-
         </LinearLayout>
 
         <!-- Divisor -->
@@ -251,6 +92,5 @@
             android:textSize="12sp"
             android:gravity="center"
             android:layout_gravity="center" />
-
     </LinearLayout>
 </ScrollView>
