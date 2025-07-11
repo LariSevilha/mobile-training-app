@@ -2,6 +2,7 @@ package com.example.trainingappmobile
 
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -12,9 +13,10 @@ import retrofit2.Response
 
 class DietDetailActivity : ComponentActivity() {
 
-    private lateinit var mealTitle: TextView
-    private lateinit var ingredientsText: TextView
+    private lateinit var weekdayText: TextView
+    private lateinit var mealsContainer: LinearLayout
     private lateinit var backButton: LinearLayout
+    private lateinit var mealTitle: TextView
 
     companion object {
         private const val TAG = "DietDetailActivity"
@@ -27,8 +29,8 @@ class DietDetailActivity : ComponentActivity() {
 
         // Initialize views
         try {
-            mealTitle = findViewById(R.id.meal_title) ?: throw IllegalStateException("meal_title not found")
-            ingredientsText = findViewById(R.id.ingredients_text) ?: throw IllegalStateException("ingredients_text not found")
+            weekdayText = findViewById(R.id.weekday_text) ?: throw IllegalStateException("weekday_text not found")
+            mealsContainer = findViewById(R.id.meals_container) ?: throw IllegalStateException("meals_container not found")
             backButton = findViewById(R.id.back_button_detail) ?: throw IllegalStateException("back_button_detail not found")
         } catch (e: Exception) {
             Log.e(TAG, "Error initializing views: ${e.message}", e)
@@ -48,8 +50,8 @@ class DietDetailActivity : ComponentActivity() {
         val dayOfWeek = intent.getStringExtra("DAY_OF_WEEK") ?: "Dia não especificado"
         Log.d(TAG, "Received data - Day: $dayOfWeek")
 
-        // Set initial title
-        mealTitle.text = "Dieta de $dayOfWeek"
+        // Set initial weekday
+        weekdayText.text = dayOfWeek
 
         // Load diet details
         loadDietDetails(dayOfWeek)
@@ -119,25 +121,20 @@ class DietDetailActivity : ComponentActivity() {
 
         Log.d(TAG, "Meals found for '$dayOfWeek': ${matchingMeals.size}")
 
-        val meal = when {
+        when {
             matchingMeals.isNotEmpty() -> {
-                Log.d(TAG, "Using specific meal for '$dayOfWeek'")
-                matchingMeals.first()
+                Log.d(TAG, "Displaying ${matchingMeals.size} meals for '$dayOfWeek'")
+                updateDietUI(matchingMeals)
             }
             meals.isNotEmpty() -> {
                 Log.w(TAG, "No specific meal found for '$dayOfWeek'. Available: ${meals.map { it.weekday }}")
                 updateNoDataUI("No meal found for $dayOfWeek")
-                return
             }
             else -> {
                 Log.w(TAG, "No meal found in planilha")
                 updateNoDataUI("No meal registered")
-                return
             }
         }
-
-        Log.d(TAG, "Selected meal: ${meal.mealType} for ${meal.weekday}")
-        updateDietUI(meal)
     }
 
     private fun normalizeDayName(day: String): String {
@@ -164,11 +161,11 @@ class DietDetailActivity : ComponentActivity() {
 
         val dayMappings = mapOf(
             "segunda" to listOf("segunda", "segunda-feira", "seg", "monday", "mon"),
-            "terça" to listOf("terça", "terça-feira", "ter", "tuesday", "tue"),
+            "terca" to listOf("terça", "terça-feira", "ter", "tuesday", "tue"),
             "quarta" to listOf("quarta", "quarta-feira", "qua", "wednesday", "wed"),
             "quinta" to listOf("quinta", "quinta-feira", "qui", "thursday", "thu"),
             "sexta" to listOf("sexta", "sexta-feira", "sex", "friday", "fri"),
-            "sábado" to listOf("sábado", "sabado", "sab", "saturday", "sat"),
+            "sabado" to listOf("sábado", "sabado", "sab", "saturday", "sat"),
             "domingo" to listOf("domingo", "dom", "sunday", "sun")
         )
 
@@ -184,42 +181,71 @@ class DietDetailActivity : ComponentActivity() {
             }
         }
 
-        val targetWords = normalizedTarget.split(" ", "-")
-        val mealWords = normalizedMeal.split(" ", "-")
-
-        for (targetWord in targetWords) {
-            if (targetWord.length >= 3) {
-                for (mealWord in mealWords) {
-                    if (mealWord.length >= 3 &&
-                        (targetWord.contains(mealWord) || mealWord.contains(targetWord))) {
-                        Log.d(TAG, "Substring match found: '$targetWord' and '$mealWord'")
-                        return true
-                    }
-                }
-            }
-        }
-
-        Log.d(TAG, "No match found")
         return false
     }
 
-    private fun updateDietUI(meal: Meal) {
-        Log.d(TAG, "Updating UI with meal: ${meal.mealType}")
+    private fun updateDietUI(meals: List<Meal>) {
+        Log.d(TAG, "Updating UI with ${meals.size} meals")
 
-        mealTitle.text = meal.getMealTypeSafe()
-        val comidas = meal.getComidasSafe()
-        ingredientsText.text = if (comidas.isNotEmpty()) {
-            comidas.joinToString("\n") { it.getFullDescription() }
-        } else {
-            "Nenhuma comida cadastrada"
+        // Clear existing views in the container
+        mealsContainer.removeAllViews()
+
+        // Set weekday from the first meal
+        weekdayText.text = meals.firstOrNull()?.weekday ?: "Dia não especificado"
+
+        if (meals.isEmpty()) {
+            updateNoDataUI("Nenhuma refeição cadastrada")
+            return
+        }
+
+        // Add a card for each meal
+        meals.forEach { meal ->
+            // Inflate a new card layout
+            val cardView = LayoutInflater.from(this).inflate(R.layout.meal_card, null)
+
+            // Find views in the card
+            val mealTypeText = cardView.findViewById<TextView>(R.id.meal_type_text)
+            val ingredientsText = cardView.findViewById<TextView>(R.id.ingredients_text)
+
+            // Set meal data
+            mealTypeText.text = meal.getMealTypeSafe()
+            val comidas = meal.getComidasSafe()
+            ingredientsText.text = if (comidas.isNotEmpty()) {
+                comidas.joinToString("\n") { it.getFullDescription() }
+            } else {
+                "Nenhuma comida cadastrada"
+            }
+
+            // Add card to container
+            val layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            layoutParams.bottomMargin = (16 * resources.displayMetrics.density).toInt() // Convert 16dp to pixels
+            mealsContainer.addView(cardView, layoutParams)
+
+            Log.d(TAG, "Added card for meal: ${meal.getMealTypeSafe()}")
         }
     }
 
     private fun updateNoDataUI(message: String) {
         Log.d(TAG, "Updating UI with error message: $message")
 
-        mealTitle.text = "Dados Indisponíveis"
+        mealsContainer.removeAllViews()
+        val errorView = LayoutInflater.from(this).inflate(R.layout.meal_card, null)
+        val mealTypeText = errorView.findViewById<TextView>(R.id.meal_type_text)
+        val ingredientsText = errorView.findViewById<TextView>(R.id.ingredients_text)
+
+        mealTypeText.text = "Dados Indisponíveis"
         ingredientsText.text = message
+        weekdayText.text = "-"
+
+        val layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        layoutParams.bottomMargin = (16 * resources.displayMetrics.density).toInt()
+        mealsContainer.addView(errorView, layoutParams)
     }
 
     override fun finish() {

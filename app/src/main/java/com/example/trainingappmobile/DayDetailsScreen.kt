@@ -35,7 +35,7 @@ class DietDetailsScreen : ComponentActivity() {
 
         // Inicializar views
         try {
-            mealTitle = findViewById(R.id.meal_title)
+            mealTitle = findViewById(R.id.title_text)
             weekdayText = findViewById(R.id.weekday_text)
             ingredientsText = findViewById(R.id.ingredients_text)
             noImageText = findViewById(R.id.no_image_text)

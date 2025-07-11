@@ -41,48 +41,13 @@
                 android:layout_marginStart="16dp" />
         </LinearLayout>
 
-        <!-- Card com Título da Refeição e Ingredientes -->
+        <!-- Container para os cards de refeições -->
         <LinearLayout
+            android:id="@+id/meals_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/input_background"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="REFEIÇÃO"
-                android:textColor="@color/gold_primary"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif-medium"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:id="@+id/meal_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Nome da Refeição"
-                android:textColor="@color/text_primary"
-                android:textSize="18sp"
-                android:fontFamily="sans-serif-medium"
-                android:textStyle="bold"
-                android:padding="12dp"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:id="@+id/ingredients_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Lista de ingredientes para a refeição."
-                android:textColor="@color/text_primary"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif-medium"
-                android:lineSpacingExtra="4dp"
-                android:padding="12dp" />
-        </LinearLayout>
+            android:layout_marginBottom="16dp" />
 
         <!-- Botão Voltar -->
         <LinearLayout
