@@ -47,6 +47,7 @@ class HomeScreen : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
 
         initializeViews()
         setupClickListeners()
@@ -312,8 +313,10 @@ class HomeScreen : ComponentActivity() {
         Log.d(TAG, "Antes de navegar para DaysOfWeekScreen - auth_token: $token, deviceId: $deviceId")
         try {
             val intent = Intent(this, DaysOfWeekScreen::class.java)
-            intent.putExtra("DATA_TYPE", type) // Corrigido de SCREEN_TYPE para DATA_TYPE
+            intent.putExtra("DATA_TYPE", type)
             startActivity(intent)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            Log.d(TAG, "Intent iniciado com sucesso")
         } catch (e: Exception) {
             Log.e(TAG, "Erro ao abrir DaysOfWeekScreen: ${e.message}", e)
             Toast.makeText(this, "Erro ao abrir tela: ${e.message}", Toast.LENGTH_LONG).show()
@@ -334,6 +337,7 @@ class HomeScreen : ComponentActivity() {
             intent.putExtra("PDF_URL", validPdf.getFullUrl())
             validPdf.weekday?.let { intent.putExtra("WEEKDAY", it) }
             startActivity(intent)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         } catch (e: Exception) {
             Log.e(TAG, "Erro ao abrir PDF: ${e.message}")
             Toast.makeText(this, "Erro ao abrir PDF", Toast.LENGTH_SHORT).show()
@@ -345,6 +349,7 @@ class HomeScreen : ComponentActivity() {
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
+        overridePendingTransition(android.R.anim.fade_out, android.R.anim.fade_in)
         finish()
     }
 
@@ -358,11 +363,32 @@ class HomeScreen : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        Log.d(TAG, "onResume chamado")
         if (currentPlanilhaData == null) {
             loadUserData()
         } else {
             updateAlertIcon()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart chamado")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause chamado")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop chamado")
+    }
+
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(android.R.anim.fade_out, android.R.anim.fade_in)
     }
 }
 

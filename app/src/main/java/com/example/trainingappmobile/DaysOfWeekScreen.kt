@@ -9,13 +9,18 @@ import androidx.activity.ComponentActivity
 
 class DaysOfWeekScreen : ComponentActivity() {
 
+    companion object {
+        private const val TAG = "DaysOfWeekScreen"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_days_of_week)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
 
         // Recuperar o tipo de dados (TRAINING, DIET ou PDF)
         val dataType = intent.getStringExtra("DATA_TYPE") ?: "TRAINING"
-        Log.d("DaysOfWeekScreen", "DATA_TYPE recebido: $dataType")
+        Log.d(TAG, "DATA_TYPE recebido: $dataType")
 
         // Referências aos botões dos dias
         val mondayButton = findViewById<LinearLayout>(R.id.monday_button)
@@ -52,13 +57,14 @@ class DaysOfWeekScreen : ComponentActivity() {
 
         // Configurar clique no botão de voltar
         backButton.setOnClickListener {
-            Log.d("DaysOfWeekScreen", "Botão Voltar clicado")
+            Log.d(TAG, "Botão Voltar clicado")
             finish()
+            overridePendingTransition(android.R.anim.fade_out, android.R.anim.fade_in)
         }
     }
 
     private fun navigateToDetails(dayOfWeek: String, dataType: String) {
-        Log.d("DaysOfWeekScreen", "Navegando para tela de detalhes - Dia: $dayOfWeek, Tipo: $dataType")
+        Log.d(TAG, "Navegando para tela de detalhes - Dia: $dayOfWeek, Tipo: $dataType")
         try {
             val intent = when (dataType) {
                 "TRAINING" -> Intent(this, ExerciseDetailActivity::class.java)
@@ -69,16 +75,38 @@ class DaysOfWeekScreen : ComponentActivity() {
             intent.putExtra("DAY_OF_WEEK", dayOfWeek)
             intent.putExtra("DATA_TYPE", dataType)
             startActivity(intent)
-            Log.d("DaysOfWeekScreen", "Intent iniciado com sucesso")
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            Log.d(TAG, "Intent iniciado com sucesso")
         } catch (e: Exception) {
-            Log.e("DaysOfWeekScreen", "Erro ao iniciar tela de detalhes: ${e.message}", e)
+            Log.e(TAG, "Erro ao iniciar tela de detalhes: ${e.message}", e)
             Toast.makeText(this, "Erro ao navegar: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onBackPressed() {
-        Log.d("DaysOfWeekScreen", "onBackPressed chamado")
+        Log.d(TAG, "onBackPressed chamado")
         super.onBackPressed()
         finish()
+        overridePendingTransition(android.R.anim.fade_out, android.R.anim.fade_in)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart chamado")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume chamado")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause chamado")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop chamado")
     }
 }
