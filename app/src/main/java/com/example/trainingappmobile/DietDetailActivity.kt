@@ -1,8 +1,10 @@
 package com.example.trainingappmobile
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -20,9 +22,40 @@ class DietDetailActivity : ComponentActivity() {
     companion object {
         private const val TAG = "DietDetailActivity"
     }
+    private fun setupMaximumSecurity() {
+        try {
+            // Configurar FLAG_SECURE para prevenir screenshots
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_SECURE,
+                WindowManager.LayoutParams.FLAG_SECURE
+            )
+
+            // Desabilitar screenshots na tela de recentes (Android 13+)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                setRecentsScreenshotEnabled(false)
+            }
+
+            // Configurar desenho das barras do sistema
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            }
+
+            // Adicionar proteção contra gravação de tela
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+            }
+
+            Log.d(TAG, "Segurança configurada com sucesso")
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao configurar segurança: ${e.message}", e)
+            // Não fazer crash da aplicação por causa da segurança
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setupMaximumSecurity()
         setContentView(R.layout.activity_diet_detail)
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
 

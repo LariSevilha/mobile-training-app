@@ -36,7 +36,7 @@ class PdfViewerScreen : ComponentActivity() {
     private var tempFile: File? = null
 
     companion object {
-        private const val TAG = "PdfViewerScreen"
+        internal const val TAG = "PdfViewerScreen"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
